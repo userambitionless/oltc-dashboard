@@ -845,3 +845,23 @@ td:nth-child(7) {
 .detail-evidence img{display:block;max-width:100%;max-height:520px;object-fit:contain;border:1px solid #dce2e6;background:#f6f8f9}
 .empty-evidence{margin-top:18px;padding:16px;border:1px dashed #cbd3d8;color:#75818a;background:#fafbfb;font-size:13px}
 @media (max-width:700px){.detail-grid{grid-template-columns:1fr}.data-header{gap:14px}.secondary-button{width:100%}.table-actions{width:100%}.action-button{flex:1;min-width:0}}
+
+
+/* Manual editing and data source audit */
+.detail-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.edit-card{margin-bottom:18px}
+.edit-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding-top:4px}
+.edit-field label{display:block;margin-bottom:7px;color:#65717a;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.edit-field input{box-sizing:border-box;width:100%;height:40px;padding:8px 11px;border:1px solid var(--border-strong);border-radius:7px;background:#fff;color:var(--text);font:13px "IBM Plex Mono",monospace;outline:none}
+.edit-field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(20,92,140,.10)}
+.edit-actions{grid-column:1 / -1;display:flex;align-items:center;gap:8px;padding-top:4px}
+.source-cell{white-space:nowrap;text-align:center}
+.source-badge{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:24px;padding:0 8px;border:1px solid #d6dde1;border-radius:5px;background:#f7f8f9;color:#66727a;font-size:10px;font-weight:700;letter-spacing:.04em}
+.source-badge.source-api{border-color:#cbdde8;background:#f3f8fb;color:#145c8c}
+.source-badge.source-manual{border-color:#e1d6bf;background:#fbf8f1;color:#80652c}
+@media (max-width:700px){
+  .detail-actions{width:100%;justify-content:stretch}
+  .detail-actions .secondary-button{flex:1}
+  .edit-form{grid-template-columns:1fr}
+  .edit-actions{grid-column:auto;flex-direction:column;align-items:stretch}
+}
