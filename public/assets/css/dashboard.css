@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-    --bg: #eef1f3;
+    --bg: #e8edf0;
     --surface: #ffffff;
     --surface-soft: #f7f8f9;
     --text: #172027;
@@ -137,8 +137,8 @@ body {
     font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
     color: var(--text);
     background:
-        linear-gradient(rgba(255,255,255,.45) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.45) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.58) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.58) 1px, transparent 1px),
         var(--bg);
     background-size: 28px 28px;
 }
