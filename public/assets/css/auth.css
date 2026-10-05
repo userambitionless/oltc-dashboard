@@ -2,7 +2,7 @@
 *{box-sizing:border-box}
 html{background:var(--bg)}
 body{min-height:100vh;margin:0;font-family:"DM Sans",ui-sans-serif,system-ui,sans-serif;color:var(--text);background:linear-gradient(rgba(255,255,255,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.45) 1px,transparent 1px),var(--bg);background-size:28px 28px}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 48%,rgba(15,35,50,.075) 100%)}
+body:before{content:"";position:fixed;inset:-18px;pointer-events:none;background:radial-gradient(ellipse at center,transparent 44%,rgba(15,35,50,.085) 72%,rgba(15,35,50,.11) 100%);filter:blur(5px);opacity:.95}
 .auth-page{position:relative;z-index:1;display:grid;place-items:center;min-height:100vh;padding:28px 16px}
 .auth-card{width:min(430px,100%);overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
 .auth-header{padding:30px 30px 24px;border-bottom:1px solid var(--border)}
