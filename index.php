@@ -2,6 +2,62 @@
 
 require_once __DIR__ . '/config/database.php';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+    $deleteId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+
+    if ($deleteId === false || $deleteId < 1) {
+        header('Location: index.php?delete_error=ID%20data%20tidak%20valid');
+        exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        $deleteStmt = $pdo->prepare("
+            SELECT foto_path
+            FROM counter_readings
+            WHERE id = :id
+            LIMIT 1
+        ");
+        $deleteStmt->execute(['id' => $deleteId]);
+        $record = $deleteStmt->fetch();
+
+        if (!$record) {
+            $pdo->rollBack();
+            header('Location: index.php?delete_error=Data%20tidak%20ditemukan');
+            exit;
+        }
+
+        $deleteStmt = $pdo->prepare("
+            DELETE FROM counter_readings
+            WHERE id = :id
+        ");
+        $deleteStmt->execute(['id' => $deleteId]);
+
+        $pdo->commit();
+
+        if (!empty($record['foto_path'])) {
+            $photoPath = ltrim(str_replace('\\', '/', (string) $record['foto_path']), '/');
+            $photoFile = __DIR__ . '/public/' . $photoPath;
+
+            if (is_file($photoFile)) {
+                unlink($photoFile);
+            }
+        }
+
+        header('Location: index.php?deleted=1');
+        exit;
+    } catch (PDOException $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        error_log('OLTC dashboard delete error: ' . $e->getMessage());
+        header('Location: index.php?delete_error=Data%20gagal%20dihapus');
+        exit;
+    }
+}
+
 $filterStart = $_GET['start_date'] ?? '';
 $filterEnd = $_GET['end_date'] ?? '';
 $filterMinValue = $_GET['min_value'] ?? '';
@@ -327,6 +383,16 @@ function evidenceUrl(?string $path): ?string
         <?php endif; ?>
     </section>
 
+    <?php if (isset($_GET['deleted'])): ?>
+        <div class="alert alert-success">
+            Data pembacaan berhasil dihapus.
+        </div>
+    <?php elseif (isset($_GET['delete_error'])): ?>
+        <div class="alert alert-error">
+            <?= htmlspecialchars((string) $_GET['delete_error']) ?>
+        </div>
+    <?php endif; ?>
+
     <section class="card data-card">
 
         <div class="data-header">
@@ -357,6 +423,7 @@ function evidenceUrl(?string $path): ?string
                             <th>Jam</th>
                             <th>Nilai Counter</th>
                             <th>Evidence</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
 
@@ -398,6 +465,15 @@ function evidenceUrl(?string $path): ?string
                                         Tidak ada
                                     </span>
                                 <?php endif; ?>
+                            </td>
+                            <td>
+                                <form method="post" action="index.php" onsubmit="return confirm('Hapus data pembacaan ID <?= htmlspecialchars((string) $row['id'], ENT_QUOTES) ?>? Data dan evidence fotonya akan dihapus permanen.');">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars((string) $row['id']) ?>">
+                                    <button type="submit" class="button button-danger">
+                                        Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
 
