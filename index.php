@@ -411,7 +411,7 @@ function evidenceUrl(?string $path): ?string
             <div class="empty">Belum ada data untuk ditampilkan pada grafik.</div>
         <?php else: ?>
             <div class="chart-wrap">
-                <svg id="counterChart" class="counter-chart" role="img" aria-label="Grafik trend nilai counter"></svg>
+                <svg id="counterChart" class="counter-chart" role="img" aria-labelledby="counterChartTitle counterChartDescription"></svg>
             </div>
         <?php endif; ?>
     </section>
@@ -595,7 +595,7 @@ function evidenceUrl(?string $path): ?string
 
         const width = Math.max(svg.parentElement.clientWidth, 320);
         const height = 330;
-        const padding = { top: 28, right: 24, bottom: 58, left: 58 };
+        const padding = { top: 28, right: 24, bottom: 58, left: 68 };
 
         const values = chartData.map((item) => item.value);
         const rawMin = Math.min(...values);
@@ -632,7 +632,14 @@ function evidenceUrl(?string $path): ?string
         };
 
         const gridCount = 5;
-        let markup = '';
+        let markup = '<title id="counterChartTitle">Trend pembacaan counter OLTC</title><desc id="counterChartDescription">Grafik menunjukkan perubahan nilai counter berdasarkan pembacaan terbaru sesuai filter yang dipilih.</desc>';
+
+        if (chartData.length > 1) {
+            const firstValue = chartData[0].value;
+            const lastValue = chartData[chartData.length - 1].value;
+            const trend = lastValue > firstValue ? 'meningkat' : (lastValue < firstValue ? 'menurun' : 'tidak berubah');
+            markup += '<text x="' + padding.left + '" y="15" class="chart-trend-note">Trend periode: ' + trend + '</text>';
+        }
 
         for (let i = 0; i <= gridCount; i++) {
             const value = minValue + ((maxValue - minValue) * (gridCount - i) / gridCount);
@@ -653,7 +660,7 @@ function evidenceUrl(?string $path): ?string
             const cy = y(item.value);
 
             const pointClass = index === chartData.length - 1 ? 'chart-point chart-point-latest' : 'chart-point';
-            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '"><title>' + item.label + ' — ' + formatValue(item.value) + '</title></circle>';
+            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" tabindex="0" aria-label="' + item.label + ', nilai ' + formatValue(item.value) + '"><title>' + item.label + ' — ' + formatValue(item.value) + '</title></circle>';
 
             const showLabel = chartData.length <= 12 || index === 0 || index === chartData.length - 1 || index % Math.ceil(chartData.length / 8) === 0;
 
