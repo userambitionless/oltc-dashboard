@@ -493,3 +493,64 @@ tbody tr:hover {
 .change-neutral {
     color: #475569;
 }
+
+
+/* History pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 18px 24px 22px;
+    border-top: 1px solid var(--border);
+    background: #fff;
+}
+
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    min-height: 36px;
+    padding: 7px 11px;
+    border: 1px solid #d7dce2;
+    border-radius: 8px;
+    background: #fff;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.pagination-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #f8fafc;
+}
+
+.pagination-link.is-active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+}
+
+.pagination-ellipsis {
+    padding: 0 3px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .pagination {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .pagination-link {
+        min-width: 34px;
+        min-height: 34px;
+        padding: 6px 9px;
+    }
+}
