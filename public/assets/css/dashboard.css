@@ -32,17 +32,17 @@ body::before {
         radial-gradient(
             ellipse at center,
             transparent 52%,
-            rgba(15, 35, 50, 0.035) 72%,
-            rgba(15, 35, 50, 0.075) 100%
+            rgba(15, 35, 50, 0.045) 70%,
+            rgba(15, 35, 50, 0.095) 100%
         ),
         radial-gradient(
             ellipse at top left,
-            rgba(15, 25, 32, 0.075),
+            rgba(15, 25, 32, 0.09),
             transparent 34%
         ),
         radial-gradient(
             ellipse at top right,
-            rgba(15, 25, 32, 0.065),
+            rgba(15, 25, 32, 0.08),
             transparent 34%
         ),
         radial-gradient(
@@ -55,8 +55,8 @@ body::before {
             rgba(15, 25, 32, 0.075),
             transparent 34%
         );
-    box-shadow: inset 0 0 110px 34px rgba(15, 25, 32, 0.065);
-    filter: blur(0.35px);
+    box-shadow: inset 0 0 145px 48px rgba(15, 25, 32, 0.085);
+    filter: blur(1.6px);
 }
 
 body::after {
