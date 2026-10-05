@@ -135,6 +135,10 @@ Dashboard / History / Chart
 
 Komunikasi antara Raspberry Pi dan server belum dikunci. Dokumentasi ini hanya mendefinisikan receiver API yang tersedia saat ini.
 
+## API Test Console
+
+`tools/api-test.php` adalah alat pengujian lokal untuk endpoint API. Halaman ini hanya dapat diakses oleh Admin dan dilindungi session/CSRF. Tool ini tidak ditujukan untuk deployment publik.
+
 ## Keamanan
 
 API Key tidak boleh:
