@@ -38,39 +38,44 @@ body::before {
 body::after {
     content: "";
     position: fixed;
-    top: 12%;
-    left: 8%;
-    width: 90px;
-    height: 90px;
+    top: 6%;
+    left: 4%;
+    width: 150px;
+    height: 150px;
     z-index: 0;
     pointer-events: none;
     border-radius: 50%;
     background: radial-gradient(
-        circle at 35% 30%,
-        rgba(67, 145, 190, 0.16),
-        rgba(20, 92, 140, 0.055) 45%,
-        transparent 72%
+        circle at 38% 34%,
+        rgba(20, 27, 32, 0.20) 0%,
+        rgba(20, 27, 32, 0.12) 28%,
+        rgba(20, 27, 32, 0.055) 52%,
+        transparent 74%
     );
-    filter: blur(2px);
-    opacity: 0.7;
-    animation: ambientOrbRoam 28s ease-in-out infinite alternate;
+    filter: blur(8px);
+    opacity: 0.95;
+    will-change: transform;
+    animation: ambientOrbRoam 34s cubic-bezier(.45, .05, .25, .95) infinite alternate;
 }
 
 @keyframes ambientOrbRoam {
     0% {
-        transform: translate3d(0, 0, 0) scale(0.85);
+        transform: translate3d(0, 0, 0) scale(0.72);
     }
-    25% {
-        transform: translate3d(24vw, 11vh, 0) scale(1);
+    18% {
+        transform: translate3d(18vw, 13vh, 0) scale(1.05);
     }
-    50% {
-        transform: translate3d(55vw, 3vh, 0) scale(0.9);
+    37% {
+        transform: translate3d(43vw, 4vh, 0) scale(0.84);
     }
-    75% {
-        transform: translate3d(76vw, 19vh, 0) scale(1.08);
+    56% {
+        transform: translate3d(68vw, 20vh, 0) scale(1.18);
+    }
+    78% {
+        transform: translate3d(52vw, 52vh, 0) scale(0.92);
     }
     100% {
-        transform: translate3d(58vw, 48vh, 0) scale(0.82);
+        transform: translate3d(15vw, 67vh, 0) scale(1.08);
     }
 }
 
