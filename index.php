@@ -190,6 +190,10 @@ $filterStart = $_GET['start_date'] ?? '';
 $filterEnd = $_GET['end_date'] ?? '';
 $filterMinValue = $_GET['min_value'] ?? '';
 $filterMaxValue = $_GET['max_value'] ?? '';
+$trendPeriod = (string) ($_GET['trend_period'] ?? 'harian');
+if (!in_array($trendPeriod, ['harian', 'mingguan', 'bulanan'], true)) {
+    $trendPeriod = 'harian';
+}
 $page = isset($_GET['page']) && ctype_digit((string) $_GET['page']) ? (int) $_GET['page'] : 1;
 $page = max(1, $page);
 $perPage = 20;
@@ -251,7 +255,7 @@ try {
         LIMIT 100
     ");
     $chartStmt->execute($params);
-    $chartDataRows = $chartStmt->fetchAll();
+    $chartDataRows = array_reverse($chartStmt->fetchAll());
 
     $dataStmt = $pdo->prepare("
         SELECT
@@ -611,26 +615,54 @@ function evidenceUrl(?string $path): ?string
 <?php endif; ?>
 
 <section class="card chart-card">
-        <div class="data-header">
+        <div class="data-header trend-header">
             <div>
                 <h2 class="data-title">Trend Pembacaan Counter</h2>
-                <p class="data-description">
-                    Perubahan nilai counter berdasarkan 100 pembacaan terbaru sesuai filter.
-                </p>
+                <p class="data-description">Analisis perubahan nilai berdasarkan agregasi periode dan filter data yang sedang aktif.</p>
             </div>
-            <?php if (!empty($chartDataRows)): ?>
-                <div class="chart-header-value">
-                    <span>TERAKHIR</span>
-                    <strong><?= htmlspecialchars(number_format((float) $latestValue, 3, ',', '.')) ?></strong>
+            <div class="trend-controls">
+                <span>PERIODE</span>
+                <div class="trend-periods">
+                    <?php foreach (['harian' => 'Harian', 'mingguan' => 'Mingguan', 'bulanan' => 'Bulanan'] as $periodKey => $periodLabel): ?>
+                        <?php $periodQuery = $_GET; $periodQuery['trend_period'] = $periodKey; $periodQuery['page'] = 1; ?>
+                        <a class="<?= $trendPeriod === $periodKey ? 'is-active' : '' ?>" href="index.php?<?= htmlspecialchars(http_build_query($periodQuery)) ?>"><?= htmlspecialchars($periodLabel) ?></a>
+                    <?php endforeach; ?>
                 </div>
-            <?php endif; ?>
+            </div>
         </div>
 
-        <?php if (empty($data)): ?>
-            <div class="empty">Belum ada data untuk ditampilkan pada grafik.</div>
+        <?php if (empty($trendData)): ?>
+            <div class="empty">Belum ada data untuk dianalisis pada grafik.</div>
         <?php else: ?>
-            <div class="chart-wrap">
-                <svg id="counterChart" class="counter-chart" role="img" aria-labelledby="counterChartTitle counterChartDescription"></svg>
+            <div class="trend-analysis">
+                <div class="trend-metrics">
+                    <div class="trend-metric"><span>Periode</span><strong><?= number_format($trendCount, 0, ',', '.') ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
+                    <div class="trend-metric"><span>Rata-rata</span><strong><?= number_format((float) $trendAverage, 3, ',', '.') ?></strong><small>Rata-rata antar periode</small></div>
+                    <div class="trend-metric"><span>Minimum</span><strong><?= number_format((float) $trendMin, 3, ',', '.') ?></strong><small>Nilai terendah</small></div>
+                    <div class="trend-metric"><span>Maksimum</span><strong><?= number_format((float) $trendMax, 3, ',', '.') ?></strong><small>Nilai tertinggi</small></div>
+                    <div class="trend-metric"><span>Perubahan</span><strong class="<?= $trendChange > 0 ? 'change-up' : ($trendChange < 0 ? 'change-down' : 'change-neutral') ?>"><?= $trendChange > 0 ? '+' : '' ?><?= number_format((float) $trendChange, 3, ',', '.') ?></strong><small><?= $trendPercent !== null ? ($trendPercent > 0 ? '+' : '') . number_format($trendPercent, 2, ',', '.') . '%' : 'Persentase tidak tersedia' ?></small></div>
+                    <div class="trend-metric"><span>Arah Trend</span><strong class="<?= $trendChange > 0 ? 'change-up' : ($trendChange < 0 ? 'change-down' : 'change-neutral') ?>"><?= htmlspecialchars($trendDirection) ?></strong><small><?= $trendFirst !== null && $trendLast !== null ? number_format($trendFirst, 3, ',', '.') . ' → ' . number_format($trendLast, 3, ',', '.') : 'Belum cukup data' ?></small></div>
+                </div>
+                <div class="chart-wrap">
+                    <svg id="counterChart" class="counter-chart" role="img" aria-labelledby="counterChartTitle counterChartDescription"></svg>
+                </div>
+                <div class="trend-period-table-wrap">
+                    <table class="trend-period-table">
+                        <thead><tr><th>Periode</th><th>Data</th><th>Rata-rata</th><th>Min</th><th>Maks</th><th>Awal → Akhir</th></tr></thead>
+                        <tbody>
+                        <?php foreach ($trendData as $period): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($period['label']) ?></td>
+                                <td><?= number_format($period['count'], 0, ',', '.') ?></td>
+                                <td><?= number_format($period['average'], 3, ',', '.') ?></td>
+                                <td><?= number_format($period['min'], 3, ',', '.') ?></td>
+                                <td><?= number_format($period['max'], 3, ',', '.') ?></td>
+                                <td><?= number_format($period['first'], 3, ',', '.') ?> → <?= number_format($period['last'], 3, ',', '.') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         <?php endif; ?>
     </section>
@@ -818,10 +850,13 @@ function evidenceUrl(?string $path): ?string
 <script>
     const chartData = <?= json_encode(array_map(static function ($row) {
         return [
-            'label' => $row['tanggal'] . ' ' . $row['jam'],
-            'value' => (float) $row['nilai_data'],
+            'label' => $row['label'],
+            'value' => (float) $row['average'],
+            'count' => (int) $row['count'],
+            'min' => (float) $row['min'],
+            'max' => (float) $row['max'],
         ];
-    }, array_reverse($chartDataRows)), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+    }, $trendData), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
     function renderCounterChart() {
         const svg = document.getElementById('counterChart');
