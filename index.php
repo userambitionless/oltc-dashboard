@@ -203,9 +203,16 @@ function evidenceUrl(?string $path): ?string
             </p>
         </div>
 
-        <div class="status">
-            <span class="status-dot"></span>
-            Database Connected
+        <div class="header-status">
+            <div class="status">
+                <span class="status-dot"></span>
+                Database Connected
+            </div>
+            <?php if ($latestDateTime): ?>
+                <div class="header-meta">
+                    Latest&nbsp;&nbsp;<?= htmlspecialchars($latestDateTime) ?>
+                </div>
+            <?php endif; ?>
         </div>
     </header>
 
@@ -399,7 +406,7 @@ function evidenceUrl(?string $path): ?string
             <div>
                 <h2 class="data-title">Riwayat Pembacaan</h2>
                 <p class="data-description">
-                    Menampilkan pembacaan $tableStart-$tableEnd dari $totalData data sesuai filter.
+                    Menampilkan <?= $tableStart ?>–<?= $tableEnd ?> dari <?= $totalData ?> data sesuai filter.
                 </p>
             </div>
         </div>
@@ -435,7 +442,7 @@ function evidenceUrl(?string $path): ?string
                             <td><?= htmlspecialchars($row['id']) ?></td>
                             <td><?= htmlspecialchars($row['hari']) ?></td>
                             <td><?= htmlspecialchars($row['tanggal']) ?></td>
-                            <td><?= htmlspecialchars($row['jam']) ?></td>
+                            <td class="time"><?= htmlspecialchars($row['jam']) ?></td>
                             <td class="value">
                                 <?= htmlspecialchars($row['nilai_data']) ?>
                             </td>
