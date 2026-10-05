@@ -4,6 +4,12 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/auth.php';
 requireAdmin();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+$csrfToken = $_SESSION['csrf_token'];
+
 $configPath = __DIR__ . '/../config/api.php';
 if (!is_file($configPath)) {
     http_response_code(503);
@@ -21,6 +27,13 @@ $result = null;
 $status = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf = (string) ($_POST['csrf_token'] ?? '');
+
+    if ($csrf === '' || !hash_equals($csrfToken, $csrf)) {
+        http_response_code(419);
+        exit('Permintaan tidak valid. Silakan muat ulang halaman.');
+    }
+
     $url = 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/oltc-dashboard/public/api/record.php';
 
     $ch = curl_init($url);
@@ -106,6 +119,7 @@ pre{max-height:360px;margin:0;padding:14px;overflow:auto;border:1px solid #dce2e
 <p class="muted">Alat pengujian lokal untuk endpoint penerimaan data counter.</p>
 </div>
 <form method="post" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 <div class="field">
 <label for="tanggal">Tanggal</label>
 <input id="tanggal" name="tanggal" type="date" value="<?= htmlspecialchars($_POST['tanggal'] ?? date('Y-m-d')) ?>" required>
