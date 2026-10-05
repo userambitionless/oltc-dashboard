@@ -457,6 +457,13 @@ h1 {
     height: 330px;
 }
 
+.chart-trend-note {
+    fill: #78848d;
+    font-size: 10px;
+    font-family: "IBM Plex Mono", monospace;
+    letter-spacing: .01em;
+}
+
 .chart-grid-line {
     stroke: #e8ecef;
     stroke-width: 1;
@@ -508,6 +515,14 @@ h1 {
     fill: #fff;
     stroke: var(--primary);
     stroke-width: 2;
+    cursor: default;
+    transition: r .12s ease, fill .12s ease;
+}
+
+.chart-point:hover,
+.chart-point:focus {
+    fill: var(--primary);
+    outline: none;
 }
 
 .chart-point-latest {
