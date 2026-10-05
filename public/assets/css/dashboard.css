@@ -310,10 +310,38 @@ h1 {
     stroke-width: 1;
 }
 
+.chart-header-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    padding-left: 18px;
+    border-left: 1px solid var(--border);
+}
+
+.chart-header-value span {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.chart-header-value strong {
+    color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 16px;
+    font-weight: 600;
+}
+
 .chart-axis-label {
     fill: #78848d;
     font-size: 10px;
     font-family: "IBM Plex Mono", monospace;
+}
+
+.chart-area {
+    fill: rgba(20, 92, 140, .055);
+    stroke: none;
 }
 
 .chart-line {
@@ -327,6 +355,12 @@ h1 {
 .chart-point {
     fill: #fff;
     stroke: var(--primary);
+    stroke-width: 2;
+}
+
+.chart-point-latest {
+    fill: var(--primary);
+    stroke: #fff;
     stroke-width: 2.5;
 }
 
@@ -385,6 +419,30 @@ td:first-child {
     color: var(--text);
     font-family: "IBM Plex Mono", monospace;
     font-weight: 600;
+    text-align: right;
+}
+
+th:nth-child(1),
+td:nth-child(1),
+th:nth-child(2),
+td:nth-child(2),
+th:nth-child(3),
+td:nth-child(3),
+th:nth-child(4),
+td:nth-child(4) {
+    text-align: left;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+    text-align: right;
+}
+
+th:nth-child(6),
+td:nth-child(6),
+th:nth-child(7),
+td:nth-child(7) {
+    text-align: center;
 }
 
 .evidence {
@@ -583,6 +641,7 @@ td:first-child {
     .page { width: min(100% - 28px, 1480px); padding-top: 20px; }
     .header { align-items: flex-start; flex-direction: column; }
     .header-status { align-items: flex-start; }
+    .chart-header-value { display: none; }
     .stats,
     .stats-summary { grid-template-columns: 1fr; }
     .filter-form { grid-template-columns: 1fr; }
