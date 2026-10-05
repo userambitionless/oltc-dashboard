@@ -73,6 +73,20 @@ h1 {
     font-size: 14px;
 }
 
+.header-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.header-meta {
+    color: var(--muted);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    letter-spacing: .01em;
+}
+
 .status {
     display: inline-flex;
     align-items: center;
@@ -125,6 +139,7 @@ h1 {
 
 .stat-value {
     color: var(--text);
+    font-variant-numeric: tabular-nums;
     font-size: clamp(25px, 2.2vw, 34px);
     font-weight: 700;
     letter-spacing: -.04em;
@@ -331,6 +346,9 @@ th, td {
 }
 
 th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     background: #f7f8f9;
     color: #65717a;
     font-size: 10px;
@@ -342,6 +360,11 @@ th {
 td {
     color: #34404a;
     font-size: 13px;
+}
+
+.time,
+.value {
+    font-variant-numeric: tabular-nums;
 }
 
 tbody tr {
@@ -559,6 +582,7 @@ td:first-child {
 @media (max-width: 700px) {
     .page { width: min(100% - 28px, 1480px); padding-top: 20px; }
     .header { align-items: flex-start; flex-direction: column; }
+    .header-status { align-items: flex-start; }
     .stats,
     .stats-summary { grid-template-columns: 1fr; }
     .filter-form { grid-template-columns: 1fr; }
