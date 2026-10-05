@@ -1,6 +1,5 @@
 <?php
 
-session_start();
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/auth.php';
 
@@ -25,7 +24,7 @@ function verifyCsrfToken(): void
     }
 }
 
-function redirectWithMessage(string $query): never
+function redirectWithMessage(string $query): void
 {
     header('Location: index.php?' . $query);
     exit;
