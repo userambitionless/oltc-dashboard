@@ -78,6 +78,22 @@ $totalData = (int) ($stats['total_data'] ?? 0);
 $latestValue = $stats['latest_value'] ?? 0;
 $latestDateTime = $stats['latest_datetime'] ?? null;
 
+function evidenceUrl(?string $path): ?string
+{
+    if (!$path) {
+        return null;
+    }
+
+    $cleanPath = ltrim(str_replace('\\', '/', $path), '/');
+    $fullPath = __DIR__ . '/public/' . $cleanPath;
+
+    if (!is_file($fullPath)) {
+        return null;
+    }
+
+    return 'public/' . $cleanPath;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -261,9 +277,31 @@ $latestDateTime = $stats['latest_datetime'] ?? null;
                                 <?= htmlspecialchars($row['nilai_data']) ?>
                             </td>
                             <td>
-                                <span class="evidence">
-                                    <?= htmlspecialchars($row['foto_path'] ?? '-') ?>
-                                </span>
+                                <?php $photoUrl = evidenceUrl($row['foto_path']); ?>
+
+                                <?php if ($photoUrl): ?>
+                                    <button
+                                        type="button"
+                                        class="evidence-button"
+                                        data-image="<?= htmlspecialchars($photoUrl) ?>"
+                                        data-caption="ID <?= htmlspecialchars($row['id']) ?> · <?= htmlspecialchars($row['tanggal']) ?> <?= htmlspecialchars($row['jam']) ?>"
+                                    >
+                                        <img
+                                            class="evidence-thumb"
+                                            src="<?= htmlspecialchars($photoUrl) ?>"
+                                            alt="Evidence pembacaan ID <?= htmlspecialchars($row['id']) ?>"
+                                            loading="lazy"
+                                        >
+                                    </button>
+                                <?php elseif (!empty($row['foto_path'])): ?>
+                                    <span class="evidence evidence-missing">
+                                        File tidak ditemukan
+                                    </span>
+                                <?php else: ?>
+                                    <span class="evidence">
+                                        Tidak ada
+                                    </span>
+                                <?php endif; ?>
                             </td>
                         </tr>
 
@@ -283,6 +321,51 @@ $latestDateTime = $stats['latest_datetime'] ?? null;
     </footer>
 
 </div>
+
+<div class="image-modal" id="imageModal" aria-hidden="true">
+    <div class="image-modal-backdrop" data-close-modal></div>
+
+    <div class="image-modal-content" role="dialog" aria-modal="true" aria-labelledby="imageModalCaption">
+        <button type="button" class="image-modal-close" data-close-modal aria-label="Tutup">
+            &times;
+        </button>
+
+        <img id="imageModalPreview" src="" alt="Evidence pembacaan">
+
+        <div class="image-modal-caption" id="imageModalCaption"></div>
+    </div>
+</div>
+
+<script>
+    const imageModal = document.getElementById('imageModal');
+    const imageModalPreview = document.getElementById('imageModalPreview');
+    const imageModalCaption = document.getElementById('imageModalCaption');
+
+    document.querySelectorAll('.evidence-button').forEach((button) => {
+        button.addEventListener('click', () => {
+            imageModalPreview.src = button.dataset.image;
+            imageModalCaption.textContent = button.dataset.caption || 'Evidence pembacaan';
+            imageModal.classList.add('is-open');
+            imageModal.setAttribute('aria-hidden', 'false');
+        });
+    });
+
+    document.querySelectorAll('[data-close-modal]').forEach((element) => {
+        element.addEventListener('click', closeImageModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+
+    function closeImageModal() {
+        imageModal.classList.remove('is-open');
+        imageModal.setAttribute('aria-hidden', 'true');
+        imageModalPreview.src = '';
+    }
+</script>
 
 </body>
 </html>
