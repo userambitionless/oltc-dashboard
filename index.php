@@ -347,12 +347,11 @@ function evidenceUrl(?string $path): ?string
                 <span class="status-dot"></span>
                 Database Connected
             </div>
-            <div class="header-nav-actions">
-            <a class="secondary-button" href="trend.php">Analisis Trend</a>
             <?php if ($isAdmin): ?>
+            <div class="header-nav-actions">
                 <a class="secondary-button" href="users.php">Manajemen User</a>
-            <?php endif; ?>
-        </div>
+            </div>
+        <?php endif; ?>
             <?php if ($latestDateTime): ?>
                 <div class="header-meta">
                     Latest&nbsp;&nbsp;<?= htmlspecialchars($latestDateTime) ?>
