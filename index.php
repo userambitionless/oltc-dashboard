@@ -391,7 +391,39 @@ function evidenceUrl(?string $path): ?string
 
     </section>
 
-    <section class="card chart-card">
+    <?php if ($detailRecord): ?>
+<section class="card detail-card">
+    <div class="data-header">
+        <div>
+            <p class="eyebrow">DETAIL PEMBACAAN</p>
+            <h2 class="data-title">Data #<?= (int) $detailRecord['id'] ?></h2>
+            <p class="data-description">Pemeriksaan satu pembacaan counter dan evidence yang tersimpan.</p>
+        </div>
+        <a class="secondary-button" href="index.php">Kembali ke riwayat</a>
+    </div>
+    <div class="detail-grid">
+        <div><span>Hari</span><strong><?= htmlspecialchars((string) $detailRecord['hari']) ?></strong></div>
+        <div><span>Tanggal</span><strong><?= htmlspecialchars((string) $detailRecord['tanggal']) ?></strong></div>
+        <div><span>Jam</span><strong><?= htmlspecialchars((string) $detailRecord['jam']) ?></strong></div>
+        <div><span>Nilai Counter</span><strong><?= htmlspecialchars(number_format((float) $detailRecord['nilai_data'], 3, ',', '.')) ?></strong></div>
+        <div><span>Dibuat</span><strong><?= htmlspecialchars((string) $detailRecord['created_at']) ?></strong></div>
+        <div><span>Diperbarui</span><strong><?= htmlspecialchars((string) $detailRecord['updated_at']) ?></strong></div>
+    </div>
+    <?php if (!empty($detailRecord['foto_path'])): ?>
+        <div class="detail-evidence">
+            <div class="detail-evidence-header">
+                <span>Evidence</span>
+                <a href="<?= htmlspecialchars((string) $detailRecord['foto_path']) ?>" target="_blank" rel="noopener">Buka ukuran penuh</a>
+            </div>
+            <img src="<?= htmlspecialchars((string) $detailRecord['foto_path']) ?>" alt="Evidence pembacaan counter ID <?= (int) $detailRecord['id'] ?>">
+        </div>
+    <?php else: ?>
+        <div class="empty-evidence">Tidak ada evidence foto untuk pembacaan ini.</div>
+    <?php endif; ?>
+</section>
+<?php endif; ?>
+
+<section class="card chart-card">
         <div class="data-header">
             <div>
                 <h2 class="data-title">Trend Pembacaan Counter</h2>
