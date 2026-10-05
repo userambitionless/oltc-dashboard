@@ -633,9 +633,8 @@ function evidenceUrl(?string $path): ?string
             const cy = y(item.value);
 
             const pointClass = index === chartData.length - 1 ? 'chart-point chart-point-latest' : 'chart-point';
-            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '">';
-                <title>${item.label} — ${formatValue(item.value)}</title>
-            </circle>`;
+            const pointClass = index === chartData.length - 1 ? 'chart-point chart-point-latest' : 'chart-point';
+            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '"><title>' + item.label + ' — ' + formatValue(item.value) + '</title></circle>';
 
             const showLabel = chartData.length <= 12 || index === 0 || index === chartData.length - 1 || index % Math.ceil(chartData.length / 8) === 0;
 
