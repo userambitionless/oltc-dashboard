@@ -4,6 +4,21 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../config/database.php';
 
+$apiConfigPath = __DIR__ . '/../../config/api.php';
+
+if (!is_file($apiConfigPath)) {
+    http_response_code(503);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'success' => false,
+        'message' => 'API belum dikonfigurasi. Buat config/api.php terlebih dahulu.',
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$apiConfig = require $apiConfigPath;
+$expectedApiKey = trim((string) ($apiConfig['api_key'] ?? ''));
+
 header('Content-Type: application/json; charset=utf-8');
 
 function jsonResponse(int $status, array $payload): never
@@ -11,6 +26,22 @@ function jsonResponse(int $status, array $payload): never
     http_response_code($status);
     echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
+}
+
+if ($expectedApiKey === '') {
+    jsonResponse(503, [
+        'success' => false,
+        'message' => 'API belum dikonfigurasi dengan API Key.',
+    ]);
+}
+
+$providedApiKey = trim((string) ($_SERVER['HTTP_X_API_KEY'] ?? ''));
+
+if ($providedApiKey === '' || !hash_equals($expectedApiKey, $providedApiKey)) {
+    jsonResponse(401, [
+        'success' => false,
+        'message' => 'API Key tidak valid atau tidak diberikan.',
+    ]);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
