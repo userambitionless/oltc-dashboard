@@ -2,6 +2,12 @@
 
 session_start();
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/auth.php';
+
+requireLogin();
+
+$currentUser = currentUser();
+$isAdmin = ($currentUser['role'] ?? '') === 'admin';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -29,6 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrfToken();
 
     $action = (string) ($_POST['action'] ?? '');
+
+    if (in_array($action, ['delete', 'edit'], true)) {
+        requireAdmin();
+    }
 
     if ($action === 'delete') {
         $deleteId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -324,6 +334,14 @@ function evidenceUrl(?string $path): ?string
         </div>
 
         <div class="header-status">
+            <div class="header-user">
+                <span><?= htmlspecialchars($currentUser['username'] ?? '') ?></span>
+                <strong><?= $isAdmin ? 'ADMIN' : 'VIEWER' ?></strong>
+                <form method="post" action="logout.php">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                    <button type="submit">Keluar</button>
+                </form>
+            </div>
             <div class="status">
                 <span class="status-dot"></span>
                 Database Connected
@@ -518,7 +536,9 @@ function evidenceUrl(?string $path): ?string
             <p class="data-description">Pemeriksaan satu pembacaan counter dan evidence yang tersimpan.</p>
         </div>
         <div class="detail-actions">
-            <a class="secondary-button" href="?edit=<?= (int) $detailRecord['id'] ?>">Edit data</a>
+            <?php if ($isAdmin): ?>
+                <a class="secondary-button" href="?edit=<?= (int) $detailRecord['id'] ?>">Edit data</a>
+            <?php endif; ?>
             <a class="secondary-button" href="index.php">Kembali ke riwayat</a>
         </div>
     </div>
@@ -709,12 +729,14 @@ function evidenceUrl(?string $path): ?string
                             <td class="table-action-cell">
                                 <div class="table-actions">
                                     <a class="action-button action-detail" href="?detail=<?= (int) $row['id'] ?>">Detail</a>
+                                    <?php if ($isAdmin): ?>
                                     <form method="post" action="index.php" onsubmit="return confirm('Hapus data pembacaan ID <?= htmlspecialchars((string) $row['id'], ENT_QUOTES) ?>? Data dan evidence fotonya akan dihapus permanen.');">
                                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?= htmlspecialchars((string) $row['id']) ?>">
                                         <button type="submit" class="action-button action-delete">Hapus</button>
                                     </form>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
