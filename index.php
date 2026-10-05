@@ -58,6 +58,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     }
 }
 
+$detailId = isset($_GET['detail']) && ctype_digit((string) $_GET['detail']) ? (int) $_GET['detail'] : 0;
+$detailRecord = null;
+
+if ($detailId > 0) {
+    $detailStmt = $pdo->prepare("
+        SELECT id, tanggal, hari, jam, nilai_data, foto_path, created_at, updated_at
+        FROM counter_readings
+        WHERE id = :id
+        LIMIT 1
+    ");
+    $detailStmt->execute(['id' => $detailId]);
+    $detailRecord = $detailStmt->fetch();
+
+    if (!$detailRecord) {
+        header('Location: index.php');
+        exit;
+    }
+}
+
 $filterStart = $_GET['start_date'] ?? '';
 $filterEnd = $_GET['end_date'] ?? '';
 $filterMinValue = $_GET['min_value'] ?? '';
@@ -413,9 +432,9 @@ function evidenceUrl(?string $path): ?string
         <div class="detail-evidence">
             <div class="detail-evidence-header">
                 <span>Evidence</span>
-                <a href="<?= htmlspecialchars((string) $detailRecord['foto_path']) ?>" target="_blank" rel="noopener">Buka ukuran penuh</a>
+                <a href="<?= htmlspecialchars('public/' . ltrim(str_replace('\\', '/', (string) $detailRecord['foto_path']), '/')) ?>" target="_blank" rel="noopener">Buka ukuran penuh</a>
             </div>
-            <img src="<?= htmlspecialchars((string) $detailRecord['foto_path']) ?>" alt="Evidence pembacaan counter ID <?= (int) $detailRecord['id'] ?>">
+            <img src="<?= htmlspecialchars('public/' . ltrim(str_replace('\\', '/', (string) $detailRecord['foto_path']), '/')) ?>" alt="Evidence pembacaan counter ID <?= (int) $detailRecord['id'] ?>">
         </div>
     <?php else: ?>
         <div class="empty-evidence">Tidak ada evidence foto untuk pembacaan ini.</div>
