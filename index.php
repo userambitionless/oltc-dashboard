@@ -379,6 +379,12 @@ function evidenceUrl(?string $path): ?string
                     Perubahan nilai counter berdasarkan 100 pembacaan terbaru sesuai filter.
                 </p>
             </div>
+            <?php if (!empty($chartDataRows)): ?>
+                <div class="chart-header-value">
+                    <span>TERAKHIR</span>
+                    <strong><?= htmlspecialchars(number_format((float) $latestValue, 3, ',', '.')) ?></strong>
+                </div>
+            <?php endif; ?>
         </div>
 
         <?php if (empty($data)): ?>
@@ -599,7 +605,10 @@ function evidenceUrl(?string $path): ?string
 
         const formatLabel = (label) => {
             const parts = label.split(' ');
-            return parts.length >= 2 ? parts[1].slice(0, 5) : label;
+            if (parts.length < 2) return label;
+            const date = parts[0].split('-');
+            const time = parts[1].slice(0, 5);
+            return date.length === 3 ? date[2] + '/' + date[1] + ' ' + time : time;
         };
 
         const gridCount = 5;
@@ -615,13 +624,16 @@ function evidenceUrl(?string $path): ?string
 
         const points = chartData.map((item, index) => `${x(index)},${y(item.value)}`).join(' ');
 
-        markup += `<polyline points="${points}" class="chart-line"></polyline>`;
+        const areaPoints = padding.left + ',' + (height - padding.bottom) + ' ' + points + ' ' + x(chartData.length - 1) + ',' + (height - padding.bottom);
+        markup += '<polygon points="' + areaPoints + '" class="chart-area"></polygon>';
+        markup += '<polyline points="' + points + '" class="chart-line"></polyline>';
 
         chartData.forEach((item, index) => {
             const cx = x(index);
             const cy = y(item.value);
 
-            markup += `<circle cx="${cx}" cy="${cy}" r="4.5" class="chart-point">
+            const pointClass = index === chartData.length - 1 ? 'chart-point chart-point-latest' : 'chart-point';
+            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '">';
                 <title>${item.label} — ${formatValue(item.value)}</title>
             </circle>`;
 
