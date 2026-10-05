@@ -62,44 +62,73 @@ body::before {
 body::after {
     content: "";
     position: fixed;
-    top: 6%;
-    left: 4%;
-    width: 150px;
-    height: 150px;
+    inset: 0;
     z-index: 0;
     pointer-events: none;
-    border-radius: 50%;
-    background: radial-gradient(
-        circle at 38% 34%,
-        rgba(20, 27, 32, 0.20) 0%,
-        rgba(20, 27, 32, 0.12) 28%,
-        rgba(20, 27, 32, 0.055) 52%,
-        transparent 74%
-    );
-    filter: blur(8px);
+    background-image:
+        radial-gradient(
+            circle,
+            rgba(20, 27, 32, 0.18) 0%,
+            rgba(20, 27, 32, 0.10) 28%,
+            rgba(20, 27, 32, 0.045) 52%,
+            transparent 74%
+        ),
+        radial-gradient(
+            circle,
+            rgba(20, 27, 32, 0.145) 0%,
+            rgba(20, 27, 32, 0.075) 30%,
+            rgba(20, 27, 32, 0.03) 55%,
+            transparent 76%
+        ),
+        radial-gradient(
+            circle,
+            rgba(20, 27, 32, 0.16) 0%,
+            rgba(20, 27, 32, 0.085) 29%,
+            rgba(20, 27, 32, 0.035) 53%,
+            transparent 75%
+        );
+    background-size: 150px 150px, 120px 120px, 175px 175px;
+    background-position:
+        4% 6%,
+        92% 72%,
+        70% 8%;
+    background-repeat: no-repeat;
+    filter: blur(9px);
     opacity: 0.95;
-    will-change: transform;
-    animation: ambientOrbRoam 34s cubic-bezier(.45, .05, .25, .95) infinite alternate;
+    will-change: background-position;
+    animation: ambientOrbRoam 38s cubic-bezier(.45, .05, .25, .95) infinite alternate;
 }
 
 @keyframes ambientOrbRoam {
     0% {
-        transform: translate3d(0, 0, 0) scale(0.72);
+        background-position:
+            4% 6%,
+            92% 72%,
+            70% 8%;
     }
-    18% {
-        transform: translate3d(18vw, 13vh, 0) scale(1.05);
+    25% {
+        background-position:
+            25% 24%,
+            72% 48%,
+            48% 18%;
     }
-    37% {
-        transform: translate3d(43vw, 4vh, 0) scale(0.84);
+    50% {
+        background-position:
+            62% 8%,
+            44% 78%,
+            18% 42%;
     }
-    56% {
-        transform: translate3d(68vw, 20vh, 0) scale(1.18);
-    }
-    78% {
-        transform: translate3d(52vw, 52vh, 0) scale(0.92);
+    75% {
+        background-position:
+            82% 42%,
+            16% 24%,
+            76% 64%;
     }
     100% {
-        transform: translate3d(15vw, 67vh, 0) scale(1.08);
+        background-position:
+            34% 78%,
+            58% 8%,
+            28% 82%;
     }
 }
 
