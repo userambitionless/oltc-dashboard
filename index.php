@@ -34,7 +34,11 @@ $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 try {
     $countStmt = $pdo->prepare("
-        SELECT COUNT(*) AS total_data
+        SELECT
+            COUNT(*) AS total_data,
+            MIN(nilai_data) AS min_value,
+            MAX(nilai_data) AS max_value,
+            AVG(nilai_data) AS avg_value
         FROM counter_readings
         $whereSql
     ");
@@ -70,6 +74,9 @@ try {
 }
 
 $totalData = (int) ($stats['total_data'] ?? 0);
+$minValue = $stats['min_value'] ?? null;
+$maxValue = $stats['max_value'] ?? null;
+$avgValue = $stats['avg_value'] ?? null;
 $latestDateTime = $latestRow
     ? ($latestRow['tanggal'] . ' ' . $latestRow['jam'])
     : null;
@@ -167,6 +174,40 @@ function evidenceUrl(?string $path): ?string
             </div>
             <div class="stat-meta">
                 Data terbaru sesuai filter
+            </div>
+        </article>
+
+    </section>
+
+    <section class="stats stats-summary">
+
+        <article class="card stat-card">
+            <div class="stat-label">Nilai Minimum</div>
+            <div class="stat-value">
+                <?= $minValue !== null ? htmlspecialchars(number_format((float) $minValue, 3, ',', '.')) : '-' ?>
+            </div>
+            <div class="stat-meta">
+                Nilai terendah sesuai filter
+            </div>
+        </article>
+
+        <article class="card stat-card">
+            <div class="stat-label">Nilai Maksimum</div>
+            <div class="stat-value">
+                <?= $maxValue !== null ? htmlspecialchars(number_format((float) $maxValue, 3, ',', '.')) : '-' ?>
+            </div>
+            <div class="stat-meta">
+                Nilai tertinggi sesuai filter
+            </div>
+        </article>
+
+        <article class="card stat-card">
+            <div class="stat-label">Nilai Rata-rata</div>
+            <div class="stat-value">
+                <?= $avgValue !== null ? htmlspecialchars(number_format((float) $avgValue, 3, ',', '.')) : '-' ?>
+            </div>
+            <div class="stat-meta">
+                Rata-rata seluruh data sesuai filter
             </div>
         </article>
 
