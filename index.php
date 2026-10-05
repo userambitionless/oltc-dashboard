@@ -474,40 +474,6 @@ function evidenceUrl(?string $path): ?string
 
     </section>
 
-    <section class="stats stats-summary">
-
-        <article class="card stat-card">
-            <div class="stat-label">Nilai Minimum</div>
-            <div class="stat-value">
-                <?= $minValue !== null ? htmlspecialchars(number_format((float) $minValue, 3, ',', '.')) : '-' ?>
-            </div>
-            <div class="stat-meta">
-                Nilai terendah sesuai filter
-            </div>
-        </article>
-
-        <article class="card stat-card">
-            <div class="stat-label">Nilai Maksimum</div>
-            <div class="stat-value">
-                <?= $maxValue !== null ? htmlspecialchars(number_format((float) $maxValue, 3, ',', '.')) : '-' ?>
-            </div>
-            <div class="stat-meta">
-                Nilai tertinggi sesuai filter
-            </div>
-        </article>
-
-        <article class="card stat-card">
-            <div class="stat-label">Nilai Rata-rata</div>
-            <div class="stat-value">
-                <?= $avgValue !== null ? htmlspecialchars(number_format((float) $avgValue, 3, ',', '.')) : '-' ?>
-            </div>
-            <div class="stat-meta">
-                Rata-rata seluruh data sesuai filter
-            </div>
-        </article>
-
-    </section>
-
     <section class="card filter-card">
 
         <div class="filter-header">
