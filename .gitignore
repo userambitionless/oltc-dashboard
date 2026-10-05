@@ -5,6 +5,7 @@
 
 # Local database configuration
 /config/local.php
+/config/api.php
 
 # Logs
 *.log
@@ -18,5 +19,5 @@ desktop.ini
 .vscode/
 
 # Local evidence photos
-/storage/evidence/*
-!/storage/evidence/.gitkeep
+/public/evidence/*
+!/public/evidence/.gitkeep
