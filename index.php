@@ -1,69 +1,167 @@
 <?php
 
+session_start();
 require_once __DIR__ . '/config/database.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
-    $deleteId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-    if ($deleteId === false || $deleteId < 1) {
-        header('Location: index.php?delete_error=ID%20data%20tidak%20valid');
-        exit;
+$csrfToken = $_SESSION['csrf_token'];
+
+function verifyCsrfToken(): void
+{
+    $token = (string) ($_POST['csrf_token'] ?? '');
+
+    if ($token === '' || !hash_equals((string) ($_SESSION['csrf_token'] ?? ''), $token)) {
+        http_response_code(419);
+        exit('Permintaan tidak valid atau sudah kedaluwarsa. Silakan kembali dan coba lagi.');
+    }
+}
+
+function redirectWithMessage(string $query): never
+{
+    header('Location: index.php?' . $query);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfToken();
+
+    $action = (string) ($_POST['action'] ?? '');
+
+    if ($action === 'delete') {
+        $deleteId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+
+        if ($deleteId === false || $deleteId < 1) {
+            redirectWithMessage('delete_error=ID%20data%20tidak%20valid');
+        }
+
+        try {
+            $pdo->beginTransaction();
+
+            $deleteStmt = $pdo->prepare("
+                SELECT foto_path
+                FROM counter_readings
+                WHERE id = :id
+                LIMIT 1
+            ");
+            $deleteStmt->execute(['id' => $deleteId]);
+            $record = $deleteStmt->fetch();
+
+            if (!$record) {
+                $pdo->rollBack();
+                redirectWithMessage('delete_error=Data%20tidak%20ditemukan');
+            }
+
+            $deleteStmt = $pdo->prepare("
+                DELETE FROM counter_readings
+                WHERE id = :id
+            ");
+            $deleteStmt->execute(['id' => $deleteId]);
+
+            $pdo->commit();
+
+            if (!empty($record['foto_path'])) {
+                $photoPath = ltrim(str_replace('\\', '/', (string) $record['foto_path']), '/');
+                $photoFile = __DIR__ . '/public/' . $photoPath;
+
+                if (is_file($photoFile)) {
+                    unlink($photoFile);
+                }
+            }
+
+            redirectWithMessage('deleted=1');
+        } catch (PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            error_log('OLTC dashboard delete error: ' . $e->getMessage());
+            redirectWithMessage('delete_error=Data%20gagal%20dihapus');
+        }
     }
 
-    try {
-        $pdo->beginTransaction();
+    if ($action === 'edit') {
+        $editId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+        $tanggal = trim((string) ($_POST['tanggal'] ?? ''));
+        $jam = trim((string) ($_POST['jam'] ?? ''));
+        $nilaiDataInput = trim((string) ($_POST['nilai_data'] ?? ''));
 
-        $deleteStmt = $pdo->prepare("
-            SELECT foto_path
-            FROM counter_readings
-            WHERE id = :id
-            LIMIT 1
-        ");
-        $deleteStmt->execute(['id' => $deleteId]);
-        $record = $deleteStmt->fetch();
-
-        if (!$record) {
-            $pdo->rollBack();
-            header('Location: index.php?delete_error=Data%20tidak%20ditemukan');
-            exit;
+        if ($editId === false || $editId < 1) {
+            redirectWithMessage('edit_error=ID%20data%20tidak%20valid');
         }
 
-        $deleteStmt = $pdo->prepare("
-            DELETE FROM counter_readings
-            WHERE id = :id
-        ");
-        $deleteStmt->execute(['id' => $deleteId]);
+        $date = DateTime::createFromFormat('!Y-m-d', $tanggal);
+        $dateErrors = DateTime::getLastErrors();
+        $validDate = $date
+            && ($dateErrors === false || ($dateErrors['warning_count'] === 0 && $dateErrors['error_count'] === 0))
+            && $date->format('Y-m-d') === $tanggal;
 
-        $pdo->commit();
+        $time = DateTime::createFromFormat('!H:i:s', $jam);
+        $timeErrors = DateTime::getLastErrors();
+        $validTime = $time
+            && ($timeErrors === false || ($timeErrors['warning_count'] === 0 && $timeErrors['error_count'] === 0))
+            && $time->format('H:i:s') === $jam;
 
-        if (!empty($record['foto_path'])) {
-            $photoPath = ltrim(str_replace('\\', '/', (string) $record['foto_path']), '/');
-            $photoFile = __DIR__ . '/public/' . $photoPath;
-
-            if (is_file($photoFile)) {
-                unlink($photoFile);
-            }
+        if (!$validDate || !$validTime || !is_numeric($nilaiDataInput) || !is_finite((float) $nilaiDataInput)) {
+            redirectWithMessage('edit_error=Data%20tanggal%2C%20jam%2C%20atau%20nilai%20tidak%20valid');
         }
 
-        header('Location: index.php?deleted=1');
-        exit;
-    } catch (PDOException $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
+        $nilaiData = (float) $nilaiDataInput;
+
+        if (abs($nilaiData) > 999999999.999) {
+            redirectWithMessage('edit_error=Nilai%20counter%20berada%20di%20luar%20batas%20yang%20didukung');
         }
 
-        error_log('OLTC dashboard delete error: ' . $e->getMessage());
-        header('Location: index.php?delete_error=Data%20gagal%20dihapus');
-        exit;
+        try {
+            $editStmt = $pdo->prepare("
+                UPDATE counter_readings
+                SET tanggal = :tanggal,
+                    jam = :jam,
+                    nilai_data = :nilai_data,
+                    source = 'manual'
+                WHERE id = :id
+            ");
+
+            $editStmt->execute([
+                'tanggal' => $tanggal,
+                'jam' => $jam,
+                'nilai_data' => $nilaiData,
+                'id' => $editId,
+            ]);
+
+            redirectWithMessage('detail=' . $editId . '&updated=1');
+        } catch (PDOException $e) {
+            error_log('OLTC dashboard edit error: ' . $e->getMessage());
+            redirectWithMessage('edit_error=Data%20gagal%20diperbarui');
+        }
     }
 }
 
 $detailId = isset($_GET['detail']) && ctype_digit((string) $_GET['detail']) ? (int) $_GET['detail'] : 0;
 $detailRecord = null;
+$editId = isset($_GET['edit']) && ctype_digit((string) $_GET['edit']) ? (int) $_GET['edit'] : 0;
+$editRecord = null;
+
+if ($editId > 0) {
+    $editStmt = $pdo->prepare("
+        SELECT id, tanggal, jam, nilai_data
+        FROM counter_readings
+        WHERE id = :id
+        LIMIT 1
+    ");
+    $editStmt->execute(['id' => $editId]);
+    $editRecord = $editStmt->fetch();
+
+    if (!$editRecord) {
+        redirectWithMessage('edit_error=Data%20tidak%20ditemukan');
+    }
+}
 
 if ($detailId > 0) {
     $detailStmt = $pdo->prepare("
-        SELECT id, tanggal, hari, jam, nilai_data, foto_path, created_at, updated_at
+        SELECT id, tanggal, hari, jam, nilai_data, foto_path, source, created_at, updated_at
         FROM counter_readings
         WHERE id = :id
         LIMIT 1
@@ -418,13 +516,17 @@ function evidenceUrl(?string $path): ?string
             <h2 class="data-title">Data #<?= (int) $detailRecord['id'] ?></h2>
             <p class="data-description">Pemeriksaan satu pembacaan counter dan evidence yang tersimpan.</p>
         </div>
-        <a class="secondary-button" href="index.php">Kembali ke riwayat</a>
+        <div class="detail-actions">
+            <a class="secondary-button" href="?edit=<?= (int) $detailRecord['id'] ?>">Edit data</a>
+            <a class="secondary-button" href="index.php">Kembali ke riwayat</a>
+        </div>
     </div>
     <div class="detail-grid">
         <div><span>Hari</span><strong><?= htmlspecialchars((string) $detailRecord['hari']) ?></strong></div>
         <div><span>Tanggal</span><strong><?= htmlspecialchars((string) $detailRecord['tanggal']) ?></strong></div>
         <div><span>Jam</span><strong><?= htmlspecialchars((string) $detailRecord['jam']) ?></strong></div>
         <div><span>Nilai Counter</span><strong><?= htmlspecialchars(number_format((float) $detailRecord['nilai_data'], 3, ',', '.')) ?></strong></div>
+        <div><span>Sumber Data</span><strong><?= ($detailRecord['source'] ?? 'api') === 'manual' ? 'Manual' : 'API' ?></strong></div>
         <div><span>Dibuat</span><strong><?= htmlspecialchars((string) $detailRecord['created_at']) ?></strong></div>
         <div><span>Diperbarui</span><strong><?= htmlspecialchars((string) $detailRecord['updated_at']) ?></strong></div>
     </div>
@@ -439,6 +541,45 @@ function evidenceUrl(?string $path): ?string
     <?php else: ?>
         <div class="empty-evidence">Tidak ada evidence foto untuk pembacaan ini.</div>
     <?php endif; ?>
+</section>
+<?php endif; ?>
+
+<?php if ($editRecord): ?>
+<section class="card edit-card">
+    <div class="data-header">
+        <div>
+            <p class="eyebrow">EDIT DATA</p>
+            <h2 class="data-title">Perbarui Pembacaan #<?= (int) $editRecord['id'] ?></h2>
+            <p class="data-description">Perubahan manual akan dicatat sebagai sumber data <strong>Manual</strong>. Evidence foto yang sudah tersimpan tidak diubah.</p>
+        </div>
+        <a class="secondary-button" href="?detail=<?= (int) $editRecord['id'] ?>">Batal</a>
+    </div>
+
+    <form class="edit-form" method="post" action="index.php">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="id" value="<?= (int) $editRecord['id'] ?>">
+
+        <div class="edit-field">
+            <label for="edit_tanggal">Tanggal</label>
+            <input type="date" id="edit_tanggal" name="tanggal" value="<?= htmlspecialchars((string) $editRecord['tanggal']) ?>" required>
+        </div>
+
+        <div class="edit-field">
+            <label for="edit_jam">Jam</label>
+            <input type="time" id="edit_jam" name="jam" step="1" value="<?= htmlspecialchars((string) $editRecord['jam']) ?>" required>
+        </div>
+
+        <div class="edit-field">
+            <label for="edit_nilai_data">Nilai Counter</label>
+            <input type="number" id="edit_nilai_data" name="nilai_data" step="0.001" value="<?= htmlspecialchars((string) $editRecord['nilai_data']) ?>" required>
+        </div>
+
+        <div class="edit-actions">
+            <button type="submit" class="button button-primary">Simpan Perubahan</button>
+            <a href="?detail=<?= (int) $editRecord['id'] ?>" class="button button-secondary">Batal</a>
+        </div>
+    </form>
 </section>
 <?php endif; ?>
 
@@ -467,13 +608,21 @@ function evidenceUrl(?string $path): ?string
         <?php endif; ?>
     </section>
 
-    <?php if (isset($_GET['deleted'])): ?>
+    <?php if (isset($_GET['updated'])): ?>
+        <div class="alert alert-success">
+            Data pembacaan berhasil diperbarui. Sumber data sekarang tercatat sebagai Manual.
+        </div>
+    <?php elseif (isset($_GET['deleted'])): ?>
         <div class="alert alert-success">
             Data pembacaan berhasil dihapus.
         </div>
     <?php elseif (isset($_GET['delete_error'])): ?>
         <div class="alert alert-error">
             <?= htmlspecialchars((string) $_GET['delete_error']) ?>
+        </div>
+    <?php elseif (isset($_GET['edit_error'])): ?>
+        <div class="alert alert-error">
+            <?= htmlspecialchars((string) $_GET['edit_error']) ?>
         </div>
     <?php endif; ?>
 
@@ -507,6 +656,7 @@ function evidenceUrl(?string $path): ?string
                             <th>Jam</th>
                             <th>Nilai Counter</th>
                             <th>Evidence</th>
+                            <th>Sumber</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -550,10 +700,16 @@ function evidenceUrl(?string $path): ?string
                                     </span>
                                 <?php endif; ?>
                             </td>
+                            <td class="source-cell">
+                                <span class="source-badge source-<?= ($row['source'] ?? 'api') === 'manual' ? 'manual' : 'api' ?>">
+                                    <?= ($row['source'] ?? 'api') === 'manual' ? 'Manual' : 'API' ?>
+                                </span>
+                            </td>
                             <td class="table-action-cell">
                                 <div class="table-actions">
                                     <a class="action-button action-detail" href="?detail=<?= (int) $row['id'] ?>">Detail</a>
                                     <form method="post" action="index.php" onsubmit="return confirm('Hapus data pembacaan ID <?= htmlspecialchars((string) $row['id'], ENT_QUOTES) ?>? Data dan evidence fotonya akan dihapus permanen.');">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?= htmlspecialchars((string) $row['id']) ?>">
                                         <button type="submit" class="action-button action-delete">Hapus</button>
