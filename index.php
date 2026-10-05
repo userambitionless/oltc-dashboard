@@ -57,13 +57,19 @@ try {
     $dataStmt->execute($params);
     $data = $dataStmt->fetchAll();
 
+    $latestRow = $data[0] ?? null;
+    $previousRow = $data[1] ?? null;
+    $latestValue = $latestRow['nilai_data'] ?? 0;
+    $previousValue = $previousRow['nilai_data'] ?? null;
+    $valueChange = $previousValue !== null
+        ? (float) $latestValue - (float) $previousValue
+        : null;
+
 } catch (PDOException $e) {
     die("Gagal mengambil data: " . $e->getMessage());
 }
 
 $totalData = (int) ($stats['total_data'] ?? 0);
-$latestRow = $data[0] ?? null;
-$latestValue = $latestRow['nilai_data'] ?? 0;
 $latestDateTime = $latestRow
     ? ($latestRow['tanggal'] . ' ' . $latestRow['jam'])
     : null;
@@ -136,6 +142,22 @@ function evidenceUrl(?string $path): ?string
             <div class="stat-meta">
                 Hasil pembacaan terakhir
             </div>
+        </article>
+
+        <article class="card stat-card">
+            <div class="stat-label">Perubahan Terakhir</div>
+            <?php if ($valueChange === null): ?>
+                <div class="stat-value">-</div>
+                <div class="stat-meta">Belum cukup data untuk dibandingkan</div>
+            <?php else: ?>
+                <?php $changeClass = $valueChange > 0 ? 'change-up' : ($valueChange < 0 ? 'change-down' : 'change-neutral'); ?>
+                <div class="stat-value <?= $changeClass ?>">
+                    <?= $valueChange > 0 ? '+' : '' ?><?= number_format($valueChange, 3, ',', '.') ?>
+                </div>
+                <div class="stat-meta">
+                    <?= $valueChange > 0 ? 'Naik dari pembacaan sebelumnya' : ($valueChange < 0 ? 'Turun dari pembacaan sebelumnya' : 'Tidak berubah') ?>
+                </div>
+            <?php endif; ?>
         </article>
 
         <article class="card stat-card">
