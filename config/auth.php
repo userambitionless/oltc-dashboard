@@ -9,12 +9,26 @@ function startAppSession(): void
     }
 }
 
+function appBasePath(): string
+{
+    $scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+    $scriptDir = str_replace('\\', '/', dirname($scriptName));
+
+    $basePath = preg_replace('#/(?:tools|public)(?:/.*)?$#', '', $scriptDir);
+
+    if (!is_string($basePath) || $basePath === '') {
+        return '';
+    }
+
+    return rtrim($basePath, '/');
+}
+
 function requireLogin(): void
 {
     startAppSession();
 
     if (empty($_SESSION['user_id'])) {
-        header('Location: login.php');
+        header('Location: ' . appBasePath() . '/login.php');
         exit;
     }
 }
