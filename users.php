@@ -224,7 +224,7 @@ try {
                     <tr>
                         <td><strong><?= htmlspecialchars($user['username']) ?></strong></td>
                         <td>
-                            <span class="source-badge <?= $user['role'] === 'admin' ? 'source-api' : 'source-manual' ?>">
+                            <span class="role-badge <?= $user['role'] === 'admin' ? 'role-admin' : 'role-viewer' ?>">
                                 <?= strtoupper(htmlspecialchars($user['role'])) ?>
                             </span>
                         </td>
