@@ -1186,3 +1186,55 @@ td:nth-child(7) {
 @media(max-width:700px){
     .header-user{justify-content:flex-start;flex-wrap:wrap;margin-bottom:6px}
 }
+
+/* User management */
+.user-create-card{margin-bottom:18px;overflow:hidden}
+.user-form{
+    display:grid;
+    grid-template-columns:1.1fr .8fr 1fr 1fr;
+    gap:14px;
+    align-items:end;
+    padding:18px 22px 22px;
+    background:#fbfcfc;
+}
+.user-form .edit-field select{
+    width:100%;
+    height:40px;
+    padding:8px 11px;
+    border:1px solid var(--border-strong);
+    border-radius:7px;
+    outline:0;
+    background:#fff;
+    color:var(--text);
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13px;
+    cursor:pointer;
+}
+.user-form .edit-field select:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(20,92,140,.10);
+}
+.user-form .edit-actions{grid-column:1/-1}
+.user-current-label{
+    display:inline-flex;
+    align-items:center;
+    min-height:32px;
+    padding:6px 10px;
+    border:1px solid #cfe4d9;
+    border-radius:7px;
+    background:#f5faf7;
+    color:#216344;
+    font-size:11px;
+    font-weight:700;
+}
+.user-table td:first-child strong{
+    color:var(--text);
+    font-size:13px;
+}
+@media(max-width:1100px){
+    .user-form{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+    .user-form{grid-template-columns:1fr}
+    .user-form .edit-actions{grid-column:auto}
+}
