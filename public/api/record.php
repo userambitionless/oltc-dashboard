@@ -187,16 +187,32 @@ try {
 
     $id = (int) $pdo->lastInsertId();
 
+    $savedDataStmt = $pdo->prepare("
+        SELECT id, tanggal, hari, jam, nilai_data, foto_path
+        FROM counter_readings
+        WHERE id = :id
+        LIMIT 1
+    ");
+    $savedDataStmt->execute(['id' => $id]);
+    $savedData = $savedDataStmt->fetch();
+
+    if (!$savedData) {
+        jsonResponse(500, [
+            'success' => false,
+            'message' => 'Data berhasil disimpan tetapi gagal dibaca kembali.',
+        ]);
+    }
+
     jsonResponse(201, [
         'success' => true,
         'message' => 'Data pembacaan berhasil disimpan.',
         'data' => [
-            'id' => $id,
-            'tanggal' => $tanggal,
-            'hari' => null,
-            'jam' => $jam,
-            'nilai_data' => $nilaiData,
-            'foto_path' => $photoPath,
+            'id' => (int) $savedData['id'],
+            'tanggal' => $savedData['tanggal'],
+            'hari' => $savedData['hari'],
+            'jam' => $savedData['jam'],
+            'nilai_data' => (float) $savedData['nilai_data'],
+            'foto_path' => $savedData['foto_path'],
         ],
     ]);
 } catch (PDOException $e) {
