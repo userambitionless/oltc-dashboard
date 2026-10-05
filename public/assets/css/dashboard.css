@@ -22,6 +22,19 @@
 
 html { background: var(--bg); }
 
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 48%,
+        rgba(15, 35, 50, 0.055) 100%
+    );
+}
+
 body {
     margin: 0;
     font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
@@ -36,6 +49,8 @@ body {
 button, input { font: inherit; }
 
 .page {
+    position: relative;
+    z-index: 1;
     width: min(1480px, calc(100% - 48px));
     margin: 0 auto;
     padding: 34px 0 28px;
