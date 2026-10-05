@@ -326,3 +326,98 @@ tbody tr:hover {
         white-space: normal;
     }
 }
+
+
+/* Evidence photo */
+.evidence-button {
+    display: inline-flex;
+    width: 58px;
+    height: 44px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #d7dce2;
+    border-radius: 8px;
+    background: #f8fafc;
+    cursor: pointer;
+}
+
+.evidence-button:hover {
+    border-color: var(--primary);
+}
+
+.evidence-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.evidence-missing {
+    color: #b45309;
+}
+
+.image-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.image-modal.is-open {
+    display: flex;
+}
+
+.image-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(3px);
+}
+
+.image-modal-content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 1100px);
+    max-height: calc(100vh - 48px);
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+}
+
+.image-modal-content img {
+    display: block;
+    width: 100%;
+    max-height: calc(100vh - 130px);
+    object-fit: contain;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.image-modal-close {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #17202a;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.image-modal-caption {
+    padding: 12px 4px 2px;
+    color: #475569;
+    font-size: 13px;
+    text-align: center;
+}
