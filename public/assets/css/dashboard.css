@@ -1357,7 +1357,7 @@ td:nth-child(7) {
 
 .trend-metrics {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1px;
     border-bottom: 1px solid var(--border);
     background: var(--border);
@@ -1458,6 +1458,10 @@ td:nth-child(7) {
     }
 
     .trend-metrics {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+    }
+
+    .trend-metric {
+        padding: 13px 15px;
     }
 }
