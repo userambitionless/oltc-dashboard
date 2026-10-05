@@ -1,0 +1,22 @@
+# Environment / local configuration
+.env
+.env.*
+!.env.example
+
+# Local database configuration
+/config/local.php
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+
+# Local evidence photos
+/storage/evidence/*
+!/storage/evidence/.gitkeep
