@@ -33,26 +33,13 @@ if ($filterMaxValue !== '' && is_numeric($filterMaxValue)) {
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 try {
-    $statsStmt = $pdo->prepare("
-        SELECT
-            COUNT(*) AS total_data,
-            COALESCE((
-                SELECT nilai_data
-                FROM counter_readings
-                ORDER BY tanggal DESC, jam DESC, id DESC
-                LIMIT 1
-            ), 0) AS latest_value,
-            (
-                SELECT CONCAT(tanggal, ' ', jam)
-                FROM counter_readings
-                ORDER BY tanggal DESC, jam DESC, id DESC
-                LIMIT 1
-            ) AS latest_datetime
+    $countStmt = $pdo->prepare("
+        SELECT COUNT(*) AS total_data
         FROM counter_readings
         $whereSql
     ");
-    $statsStmt->execute($params);
-    $stats = $statsStmt->fetch();
+    $countStmt->execute($params);
+    $stats = $countStmt->fetch();
 
     $dataStmt = $pdo->prepare("
         SELECT
@@ -75,8 +62,11 @@ try {
 }
 
 $totalData = (int) ($stats['total_data'] ?? 0);
-$latestValue = $stats['latest_value'] ?? 0;
-$latestDateTime = $stats['latest_datetime'] ?? null;
+$latestRow = $data[0] ?? null;
+$latestValue = $latestRow['nilai_data'] ?? 0;
+$latestDateTime = $latestRow
+    ? ($latestRow['tanggal'] . ' ' . $latestRow['jam'])
+    : null;
 
 function evidenceUrl(?string $path): ?string
 {
@@ -231,6 +221,25 @@ function evidenceUrl(?string $path): ?string
 
     </section>
 
+    <section class="card chart-card">
+        <div class="data-header">
+            <div>
+                <h2 class="data-title">Trend Pembacaan Counter</h2>
+                <p class="data-description">
+                    Perubahan nilai counter berdasarkan data yang sedang ditampilkan.
+                </p>
+            </div>
+        </div>
+
+        <?php if (empty($data)): ?>
+            <div class="empty">Belum ada data untuk ditampilkan pada grafik.</div>
+        <?php else: ?>
+            <div class="chart-wrap">
+                <svg id="counterChart" class="counter-chart" role="img" aria-label="Grafik trend nilai counter"></svg>
+            </div>
+        <?php endif; ?>
+    </section>
+
     <section class="card data-card">
 
         <div class="data-header">
@@ -337,6 +346,92 @@ function evidenceUrl(?string $path): ?string
 </div>
 
 <script>
+    const chartData = <?= json_encode(array_map(static function ($row) {
+        return [
+            'label' => $row['tanggal'] . ' ' . $row['jam'],
+            'value' => (float) $row['nilai_data'],
+        ];
+    }, array_reverse($data)), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+
+    function renderCounterChart() {
+        const svg = document.getElementById('counterChart');
+
+        if (!svg || chartData.length === 0) {
+            return;
+        }
+
+        const width = Math.max(svg.parentElement.clientWidth, 320);
+        const height = 330;
+        const padding = { top: 28, right: 24, bottom: 58, left: 58 };
+
+        const values = chartData.map((item) => item.value);
+        const rawMin = Math.min(...values);
+        const rawMax = Math.max(...values);
+        const range = rawMax - rawMin || Math.max(Math.abs(rawMax) * 0.05, 1);
+        const minValue = rawMin - range * 0.12;
+        const maxValue = rawMax + range * 0.12;
+
+        const plotWidth = width - padding.left - padding.right;
+        const plotHeight = height - padding.top - padding.bottom;
+
+        const x = (index) => {
+            if (chartData.length === 1) {
+                return padding.left + plotWidth / 2;
+            }
+            return padding.left + (index / (chartData.length - 1)) * plotWidth;
+        };
+
+        const y = (value) => {
+            return padding.top + ((maxValue - value) / (maxValue - minValue)) * plotHeight;
+        };
+
+        const formatValue = (value) => Number(value).toLocaleString('id-ID', {
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
+        });
+
+        const formatLabel = (label) => {
+            const parts = label.split(' ');
+            return parts.length >= 2 ? parts[1].slice(0, 5) : label;
+        };
+
+        const gridCount = 5;
+        let markup = '';
+
+        for (let i = 0; i <= gridCount; i++) {
+            const value = minValue + ((maxValue - minValue) * (gridCount - i) / gridCount);
+            const yPos = y(value);
+
+            markup += `<line x1="${padding.left}" y1="${yPos}" x2="${width - padding.right}" y2="${yPos}" class="chart-grid-line"></line>`;
+            markup += `<text x="${padding.left - 10}" y="${yPos + 4}" text-anchor="end" class="chart-axis-label">${formatValue(value)}</text>`;
+        }
+
+        const points = chartData.map((item, index) => `${x(index)},${y(item.value)}`).join(' ');
+
+        markup += `<polyline points="${points}" class="chart-line"></polyline>`;
+
+        chartData.forEach((item, index) => {
+            const cx = x(index);
+            const cy = y(item.value);
+
+            markup += `<circle cx="${cx}" cy="${cy}" r="4.5" class="chart-point">
+                <title>${item.label} — ${formatValue(item.value)}</title>
+            </circle>`;
+
+            const showLabel = chartData.length <= 12 || index === 0 || index === chartData.length - 1 || index % Math.ceil(chartData.length / 8) === 0;
+
+            if (showLabel) {
+                markup += `<text x="${cx}" y="${height - 25}" text-anchor="middle" class="chart-axis-label">${formatLabel(item.label)}</text>`;
+            }
+        });
+
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        svg.innerHTML = markup;
+    }
+
+    renderCounterChart();
+    window.addEventListener('resize', renderCounterChart);
+
     const imageModal = document.getElementById('imageModal');
     const imageModalPreview = document.getElementById('imageModalPreview');
     const imageModalCaption = document.getElementById('imageModalCaption');
