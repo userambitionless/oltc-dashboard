@@ -155,6 +155,8 @@ $editId = isset($_GET['edit']) && ctype_digit((string) $_GET['edit']) ? (int) $_
 $editRecord = null;
 
 if ($editId > 0) {
+    requireAdmin();
+
     $editStmt = $pdo->prepare("
         SELECT id, tanggal, jam, nilai_data
         FROM counter_readings
