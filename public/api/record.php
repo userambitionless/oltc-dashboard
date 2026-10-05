@@ -6,79 +6,99 @@ require_once __DIR__ . '/../../config/database.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
+function jsonResponse(int $status, array $payload): never
+{
+    http_response_code($status);
+    echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode([
+    jsonResponse(405, [
         'success' => false,
         'message' => 'Method tidak diizinkan. Gunakan POST.',
     ]);
-    exit;
 }
 
-$tanggal = trim($_POST['tanggal'] ?? '');
-$jam = trim($_POST['jam'] ?? '');
-$nilaiData = trim($_POST['nilai_data'] ?? '');
+$tanggal = trim((string) ($_POST['tanggal'] ?? ''));
+$jam = trim((string) ($_POST['jam'] ?? ''));
+$nilaiDataInput = trim((string) ($_POST['nilai_data'] ?? ''));
 
-if ($tanggal === '' || $jam === '' || $nilaiData === '') {
-    http_response_code(422);
-    echo json_encode([
+if ($tanggal === '' || $jam === '' || $nilaiDataInput === '') {
+    jsonResponse(422, [
         'success' => false,
         'message' => 'tanggal, jam, dan nilai_data wajib diisi.',
     ]);
-    exit;
 }
 
-$date = DateTime::createFromFormat('Y-m-d', $tanggal);
-$time = DateTime::createFromFormat('H:i:s', $jam);
+$date = DateTime::createFromFormat('!Y-m-d', $tanggal);
+$dateErrors = DateTime::getLastErrors();
 
-if (!$date || $date->format('Y-m-d') !== $tanggal) {
-    http_response_code(422);
-    echo json_encode([
+if (
+    !$date ||
+    ($dateErrors !== false && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0)) ||
+    $date->format('Y-m-d') !== $tanggal
+) {
+    jsonResponse(422, [
         'success' => false,
         'message' => 'Format tanggal harus YYYY-MM-DD.',
     ]);
-    exit;
 }
 
-if (!$time || $time->format('H:i:s') !== $jam) {
-    http_response_code(422);
-    echo json_encode([
+$time = DateTime::createFromFormat('!H:i:s', $jam);
+$timeErrors = DateTime::getLastErrors();
+
+if (
+    !$time ||
+    ($timeErrors !== false && ($timeErrors['warning_count'] > 0 || $timeErrors['error_count'] > 0)) ||
+    $time->format('H:i:s') !== $jam
+) {
+    jsonResponse(422, [
         'success' => false,
         'message' => 'Format jam harus HH:MM:SS.',
     ]);
-    exit;
 }
 
-if (!is_numeric($nilaiData)) {
-    http_response_code(422);
-    echo json_encode([
+if (!is_numeric($nilaiDataInput) || !is_finite((float) $nilaiDataInput)) {
+    jsonResponse(422, [
         'success' => false,
-        'message' => 'nilai_data harus berupa angka.',
+        'message' => 'nilai_data harus berupa angka yang valid.',
     ]);
-    exit;
 }
 
-$nilaiData = (float) $nilaiData;
+$nilaiData = (float) $nilaiDataInput;
+
+if (abs($nilaiData) > 999999999.999) {
+    jsonResponse(422, [
+        'success' => false,
+        'message' => 'nilai_data berada di luar batas yang didukung.',
+    ]);
+}
 
 $photoPath = null;
 
 if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
-    if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
-        http_response_code(422);
-        echo json_encode([
+    $photo = $_FILES['foto'];
+
+    if ($photo['error'] !== UPLOAD_ERR_OK) {
+        jsonResponse(422, [
             'success' => false,
             'message' => 'Upload foto gagal.',
         ]);
-        exit;
     }
 
-    if ($_FILES['foto']['size'] > 10 * 1024 * 1024) {
-        http_response_code(422);
-        echo json_encode([
+    if (!isset($photo['tmp_name'], $photo['size']) || !is_uploaded_file($photo['tmp_name'])) {
+        jsonResponse(422, [
             'success' => false,
-            'message' => 'Ukuran foto maksimal 10 MB.',
+            'message' => 'File foto tidak valid.',
         ]);
-        exit;
+    }
+
+    if ((int) $photo['size'] <= 0 || (int) $photo['size'] > 10 * 1024 * 1024) {
+        jsonResponse(422, [
+            'success' => false,
+            'message' => 'Ukuran foto harus lebih dari 0 dan maksimal 10 MB.',
+        ]);
     }
 
     $allowedMimeTypes = [
@@ -88,38 +108,32 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
     ];
 
     $finfo = new finfo(FILEINFO_MIME_TYPE);
-    $mimeType = $finfo->file($_FILES['foto']['tmp_name']);
+    $mimeType = $finfo->file($photo['tmp_name']);
 
     if (!isset($allowedMimeTypes[$mimeType])) {
-        http_response_code(422);
-        echo json_encode([
+        jsonResponse(422, [
             'success' => false,
             'message' => 'Format foto harus JPG, PNG, atau WEBP.',
         ]);
-        exit;
     }
 
     $evidenceDirectory = __DIR__ . '/../evidence';
 
     if (!is_dir($evidenceDirectory) && !mkdir($evidenceDirectory, 0775, true)) {
-        http_response_code(500);
-        echo json_encode([
+        jsonResponse(500, [
             'success' => false,
             'message' => 'Folder evidence tidak dapat dibuat.',
         ]);
-        exit;
     }
 
     $filename = bin2hex(random_bytes(16)) . '.' . $allowedMimeTypes[$mimeType];
     $destination = $evidenceDirectory . DIRECTORY_SEPARATOR . $filename;
 
-    if (!move_uploaded_file($_FILES['foto']['tmp_name'], $destination)) {
-        http_response_code(500);
-        echo json_encode([
+    if (!move_uploaded_file($photo['tmp_name'], $destination)) {
+        jsonResponse(500, [
             'success' => false,
             'message' => 'Foto gagal disimpan.',
         ]);
-        exit;
     }
 
     $photoPath = 'evidence/' . $filename;
@@ -142,7 +156,7 @@ try {
 
     $id = (int) $pdo->lastInsertId();
 
-    echo json_encode([
+    jsonResponse(201, [
         'success' => true,
         'message' => 'Data pembacaan berhasil disimpan.',
         'data' => [
@@ -153,18 +167,19 @@ try {
             'nilai_data' => $nilaiData,
             'foto_path' => $photoPath,
         ],
-    ], JSON_UNESCAPED_SLASHES);
-
+    ]);
 } catch (PDOException $e) {
-    if ($photoPath) {
+    if ($photoPath !== null) {
         $savedPhoto = __DIR__ . '/../' . $photoPath;
+
         if (is_file($savedPhoto)) {
             unlink($savedPhoto);
         }
     }
 
-    http_response_code(500);
-    echo json_encode([
+    error_log('OLTC record API database error: ' . $e->getMessage());
+
+    jsonResponse(500, [
         'success' => false,
         'message' => 'Data gagal disimpan ke database.',
     ]);
