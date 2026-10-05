@@ -550,7 +550,8 @@ function evidenceUrl(?string $path): ?string
                                     </span>
                                 <?php endif; ?>
                             </td>
-                            <td>
+                            <td class="table-action-cell">
+                                <a class="table-detail-link" href="?detail=<?= (int) $row['id'] ?>">Detail</a>
                                 <form method="post" action="index.php" onsubmit="return confirm('Hapus data pembacaan ID <?= htmlspecialchars((string) $row['id'], ENT_QUOTES) ?>? Data dan evidence fotonya akan dihapus permanen.');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= htmlspecialchars((string) $row['id']) ?>">
