@@ -249,7 +249,8 @@ try {
             tanggal,
             jam,
             nilai_data,
-            foto_path
+            foto_path,
+            source
         FROM counter_readings
         $whereSql
         ORDER BY tanggal DESC, jam DESC, id DESC
