@@ -1409,18 +1409,39 @@ td:nth-child(7) {
 }
 
 .trend-period-table {
-    min-width: 720px;
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
 }
 
 .trend-period-table th,
 .trend-period-table td {
     padding: 10px 15px;
     font-size: 10px;
+    vertical-align: middle;
 }
 
 .trend-period-table th {
     position: static;
     background: #f7f8f9;
+}
+
+.trend-period-table th:nth-child(1),
+.trend-period-table td:nth-child(1) {
+    width: 24%;
+}
+
+.trend-period-table th:nth-child(2),
+.trend-period-table td:nth-child(2) {
+    width: 14%;
+    text-align: center;
+}
+
+.trend-period-table th:nth-child(3),
+.trend-period-table td:nth-child(3) {
+    width: 62%;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .trend-period-table td {
@@ -1429,8 +1450,8 @@ td:nth-child(7) {
     font-variant-numeric: tabular-nums;
 }
 
-.trend-period-table td:not(:first-child) {
-    text-align: right;
+.trend-period-table tbody tr:hover {
+    background: #fafcfd;
 }
 
 @media (max-width: 1100px) {
