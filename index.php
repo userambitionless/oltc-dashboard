@@ -663,9 +663,6 @@ function evidenceUrl(?string $path): ?string
             <div class="trend-analysis">
                 <div class="trend-metrics">
                     <div class="trend-metric"><span>Periode</span><strong><?= number_format($trendCount, 0, ',', '.') ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
-                    <div class="trend-metric"><span>Rata-rata</span><strong><?= number_format((float) $trendAverage, 3, ',', '.') ?></strong><small>Rata-rata antar periode</small></div>
-                    <div class="trend-metric"><span>Minimum</span><strong><?= number_format((float) $trendMin, 3, ',', '.') ?></strong><small>Nilai terendah</small></div>
-                    <div class="trend-metric"><span>Maksimum</span><strong><?= number_format((float) $trendMax, 3, ',', '.') ?></strong><small>Nilai tertinggi</small></div>
                     <div class="trend-metric"><span>Perubahan</span><strong class="<?= $trendChange > 0 ? 'change-up' : ($trendChange < 0 ? 'change-down' : 'change-neutral') ?>"><?= $trendChange > 0 ? '+' : '' ?><?= number_format((float) $trendChange, 3, ',', '.') ?></strong><small><?= $trendPercent !== null ? ($trendPercent > 0 ? '+' : '') . number_format($trendPercent, 2, ',', '.') . '%' : 'Persentase tidak tersedia' ?></small></div>
                     <div class="trend-metric"><span>Arah Trend</span><strong class="<?= $trendChange > 0 ? 'change-up' : ($trendChange < 0 ? 'change-down' : 'change-neutral') ?>"><?= htmlspecialchars($trendDirection) ?></strong><small><?= $trendFirst !== null && $trendLast !== null ? number_format($trendFirst, 3, ',', '.') . ' → ' . number_format($trendLast, 3, ',', '.') : 'Belum cukup data' ?></small></div>
                 </div>
