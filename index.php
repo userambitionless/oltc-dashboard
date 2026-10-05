@@ -6,6 +6,9 @@ $filterStart = $_GET['start_date'] ?? '';
 $filterEnd = $_GET['end_date'] ?? '';
 $filterMinValue = $_GET['min_value'] ?? '';
 $filterMaxValue = $_GET['max_value'] ?? '';
+$page = isset($_GET['page']) && ctype_digit((string) $_GET['page']) ? (int) $_GET['page'] : 1;
+$page = max(1, $page);
+$perPage = 20;
 
 $where = [];
 $params = [];
@@ -45,6 +48,25 @@ try {
     $countStmt->execute($params);
     $stats = $countStmt->fetch();
 
+    $totalData = (int) ($stats['total_data'] ?? 0);
+    $totalPages = max(1, (int) ceil($totalData / $perPage));
+    $page = min($page, $totalPages);
+    $offset = ($page - 1) * $perPage;
+
+    $chartStmt = $pdo->prepare("
+        SELECT
+            id,
+            tanggal,
+            jam,
+            nilai_data
+        FROM counter_readings
+        $whereSql
+        ORDER BY tanggal DESC, jam DESC, id DESC
+        LIMIT 100
+    ");
+    $chartStmt->execute($params);
+    $chartDataRows = $chartStmt->fetchAll();
+
     $dataStmt = $pdo->prepare("
         SELECT
             id,
@@ -56,13 +78,13 @@ try {
         FROM counter_readings
         $whereSql
         ORDER BY tanggal DESC, jam DESC, id DESC
-        LIMIT 100
+        LIMIT $perPage OFFSET $offset
     ");
     $dataStmt->execute($params);
     $data = $dataStmt->fetchAll();
 
-    $latestRow = $data[0] ?? null;
-    $previousRow = $data[1] ?? null;
+    $latestRow = $chartDataRows[0] ?? null;
+    $previousRow = $chartDataRows[1] ?? null;
     $latestValue = $latestRow['nilai_data'] ?? 0;
     $previousValue = $previousRow['nilai_data'] ?? null;
     $valueChange = $previousValue !== null
@@ -74,6 +96,8 @@ try {
 }
 
 $totalData = (int) ($stats['total_data'] ?? 0);
+$tableStart = $totalData > 0 ? $offset + 1 : 0;
+$tableEnd = min($offset + $perPage, $totalData);
 $minValue = $stats['min_value'] ?? null;
 $maxValue = $stats['max_value'] ?? null;
 $avgValue = $stats['avg_value'] ?? null;
@@ -289,7 +313,7 @@ function evidenceUrl(?string $path): ?string
             <div>
                 <h2 class="data-title">Trend Pembacaan Counter</h2>
                 <p class="data-description">
-                    Perubahan nilai counter berdasarkan data yang sedang ditampilkan.
+                    Perubahan nilai counter berdasarkan 100 pembacaan terbaru sesuai filter.
                 </p>
             </div>
         </div>
@@ -309,7 +333,7 @@ function evidenceUrl(?string $path): ?string
             <div>
                 <h2 class="data-title">Riwayat Pembacaan</h2>
                 <p class="data-description">
-                    Menampilkan maksimal 100 pembacaan terbaru sesuai filter.
+                    Menampilkan pembacaan $tableStart-$tableEnd dari $totalData data sesuai filter.
                 </p>
             </div>
         </div>
@@ -386,6 +410,43 @@ function evidenceUrl(?string $path): ?string
 
         </div>
 
+        <?php if ($totalPages > 1): ?>
+            <nav class="pagination" aria-label="Pagination">
+                <?php
+                $baseQuery = $_GET;
+                $pageUrl = static function (int $targetPage) use ($baseQuery): string {
+                    $query = $baseQuery;
+                    $query['page'] = $targetPage;
+                    return 'index.php?' . http_build_query($query);
+                };
+                $startPage = max(1, $page - 2);
+                $endPage = min($totalPages, $page + 2);
+                ?>
+
+                <?php if ($page > 1): ?>
+                    <a class="pagination-link" href="<?= htmlspecialchars($pageUrl($page - 1)) ?>">Sebelumnya</a>
+                <?php endif; ?>
+
+                <?php if ($startPage > 1): ?>
+                    <a class="pagination-link" href="<?= htmlspecialchars($pageUrl(1)) ?>">1</a>
+                    <?php if ($startPage > 2): ?><span class="pagination-ellipsis">...</span><?php endif; ?>
+                <?php endif; ?>
+
+                <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                    <a class="pagination-link <?= $i === $page ? 'is-active' : '' ?>" href="<?= htmlspecialchars($pageUrl($i)) ?>"><?= $i ?></a>
+                <?php endfor; ?>
+
+                <?php if ($endPage < $totalPages): ?>
+                    <?php if ($endPage < $totalPages - 1): ?><span class="pagination-ellipsis">...</span><?php endif; ?>
+                    <a class="pagination-link" href="<?= htmlspecialchars($pageUrl($totalPages)) ?>"><?= $totalPages ?></a>
+                <?php endif; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <a class="pagination-link" href="<?= htmlspecialchars($pageUrl($page + 1)) ?>">Berikutnya</a>
+                <?php endif; ?>
+            </nav>
+        <?php endif; ?>
+
     </section>
 
     <footer class="footer">
@@ -414,7 +475,7 @@ function evidenceUrl(?string $path): ?string
             'label' => $row['tanggal'] . ' ' . $row['jam'],
             'value' => (float) $row['nilai_data'],
         ];
-    }, array_reverse($data)), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+    }, array_reverse($chartDataRows)), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
     function renderCounterChart() {
         const svg = document.getElementById('counterChart');
