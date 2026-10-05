@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../config/auth.php';
+requireAdmin();
+
 $configPath = __DIR__ . '/../config/api.php';
 if (!is_file($configPath)) {
     http_response_code(503);
@@ -138,7 +141,7 @@ pre{max-height:360px;margin:0;padding:14px;overflow:auto;border:1px solid #dce2e
 </div>
 <?php endif; ?>
 
-<p class="note">Halaman ini khusus development lokal. Jangan expose ke internet/public deployment.</p>
+<p class="note">Halaman ini khusus development lokal dan hanya dapat diakses Admin. Jangan expose ke internet/public deployment.</p>
 </section>
 </main>
 </body>
