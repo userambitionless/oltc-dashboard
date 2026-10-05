@@ -69,6 +69,8 @@ $perPage = 20;
 $where = [];
 $params = [];
 
+$hasActiveFilters = $filterStart !== '' || $filterEnd !== '' || $filterMinValue !== '' || $filterMaxValue !== '';
+
 if ($filterStart !== '') {
     $where[] = 'tanggal >= :start_date';
     $params['start_date'] = $filterStart;
@@ -368,6 +370,24 @@ function evidenceUrl(?string $path): ?string
             </div>
 
         </form>
+
+        <?php if ($hasActiveFilters): ?>
+            <div class="active-filters">
+                <span class="active-filters-label">Filter aktif</span>
+                <?php if ($filterStart !== ''): ?>
+                    <span class="filter-chip">Mulai: <?= htmlspecialchars($filterStart) ?></span>
+                <?php endif; ?>
+                <?php if ($filterEnd !== ''): ?>
+                    <span class="filter-chip">Sampai: <?= htmlspecialchars($filterEnd) ?></span>
+                <?php endif; ?>
+                <?php if ($filterMinValue !== ''): ?>
+                    <span class="filter-chip">Min: <?= htmlspecialchars($filterMinValue) ?></span>
+                <?php endif; ?>
+                <?php if ($filterMaxValue !== ''): ?>
+                    <span class="filter-chip">Maks: <?= htmlspecialchars($filterMaxValue) ?></span>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
     </section>
 
