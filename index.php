@@ -2,8 +2,38 @@
 
 require_once __DIR__ . '/config/database.php';
 
+$filterStart = $_GET['start_date'] ?? '';
+$filterEnd = $_GET['end_date'] ?? '';
+$filterMinValue = $_GET['min_value'] ?? '';
+$filterMaxValue = $_GET['max_value'] ?? '';
+
+$where = [];
+$params = [];
+
+if ($filterStart !== '') {
+    $where[] = 'tanggal >= :start_date';
+    $params['start_date'] = $filterStart;
+}
+
+if ($filterEnd !== '') {
+    $where[] = 'tanggal <= :end_date';
+    $params['end_date'] = $filterEnd;
+}
+
+if ($filterMinValue !== '' && is_numeric($filterMinValue)) {
+    $where[] = 'nilai_data >= :min_value';
+    $params['min_value'] = $filterMinValue;
+}
+
+if ($filterMaxValue !== '' && is_numeric($filterMaxValue)) {
+    $where[] = 'nilai_data <= :max_value';
+    $params['max_value'] = $filterMaxValue;
+}
+
+$whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
 try {
-    $statsStmt = $pdo->query("
+    $statsStmt = $pdo->prepare("
         SELECT
             COUNT(*) AS total_data,
             COALESCE((
@@ -19,11 +49,12 @@ try {
                 LIMIT 1
             ) AS latest_datetime
         FROM counter_readings
+        $whereSql
     ");
-
+    $statsStmt->execute($params);
     $stats = $statsStmt->fetch();
 
-    $dataStmt = $pdo->query("
+    $dataStmt = $pdo->prepare("
         SELECT
             id,
             hari,
@@ -32,10 +63,11 @@ try {
             nilai_data,
             foto_path
         FROM counter_readings
+        $whereSql
         ORDER BY tanggal DESC, jam DESC, id DESC
         LIMIT 100
     ");
-
+    $dataStmt->execute($params);
     $data = $dataStmt->fetchAll();
 
 } catch (PDOException $e) {
@@ -86,7 +118,7 @@ $latestDateTime = $stats['latest_datetime'] ?? null;
                 <?= number_format($totalData, 0, ',', '.') ?>
             </div>
             <div class="stat-meta">
-                Seluruh data yang tersimpan
+                Sesuai filter yang dipilih
             </div>
         </article>
 
@@ -106,9 +138,80 @@ $latestDateTime = $stats['latest_datetime'] ?? null;
                 <?= $latestDateTime ? htmlspecialchars($latestDateTime) : '-' ?>
             </div>
             <div class="stat-meta">
-                Tanggal dan waktu data terbaru
+                Data terbaru sesuai filter
             </div>
         </article>
+
+    </section>
+
+    <section class="card filter-card">
+
+        <div class="filter-header">
+            <div>
+                <h2 class="data-title">Filter Data</h2>
+                <p class="data-description">
+                    Saring riwayat berdasarkan tanggal dan rentang nilai counter.
+                </p>
+            </div>
+        </div>
+
+        <form class="filter-form" method="get" action="">
+
+            <div class="filter-field">
+                <label for="start_date">Tanggal Mulai</label>
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="<?= htmlspecialchars($filterStart) ?>"
+                >
+            </div>
+
+            <div class="filter-field">
+                <label for="end_date">Tanggal Akhir</label>
+                <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    value="<?= htmlspecialchars($filterEnd) ?>"
+                >
+            </div>
+
+            <div class="filter-field">
+                <label for="min_value">Nilai Minimum</label>
+                <input
+                    type="number"
+                    id="min_value"
+                    name="min_value"
+                    step="0.001"
+                    value="<?= htmlspecialchars($filterMinValue) ?>"
+                    placeholder="Contoh: 100"
+                >
+            </div>
+
+            <div class="filter-field">
+                <label for="max_value">Nilai Maksimum</label>
+                <input
+                    type="number"
+                    id="max_value"
+                    name="max_value"
+                    step="0.001"
+                    value="<?= htmlspecialchars($filterMaxValue) ?>"
+                    placeholder="Contoh: 200"
+                >
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="button button-primary">
+                    Terapkan Filter
+                </button>
+
+                <a href="index.php" class="button button-secondary">
+                    Reset
+                </a>
+            </div>
+
+        </form>
 
     </section>
 
@@ -118,7 +221,7 @@ $latestDateTime = $stats['latest_datetime'] ?? null;
             <div>
                 <h2 class="data-title">Riwayat Pembacaan</h2>
                 <p class="data-description">
-                    Menampilkan maksimal 100 pembacaan terbaru dari database.
+                    Menampilkan maksimal 100 pembacaan terbaru sesuai filter.
                 </p>
             </div>
         </div>
@@ -128,7 +231,7 @@ $latestDateTime = $stats['latest_datetime'] ?? null;
             <?php if (empty($data)): ?>
 
                 <div class="empty">
-                    Belum ada data pembacaan.
+                    Tidak ada data yang sesuai dengan filter.
                 </div>
 
             <?php else: ?>
@@ -151,17 +254,12 @@ $latestDateTime = $stats['latest_datetime'] ?? null;
 
                         <tr>
                             <td><?= htmlspecialchars($row['id']) ?></td>
-
                             <td><?= htmlspecialchars($row['hari']) ?></td>
-
                             <td><?= htmlspecialchars($row['tanggal']) ?></td>
-
                             <td><?= htmlspecialchars($row['jam']) ?></td>
-
                             <td class="value">
                                 <?= htmlspecialchars($row['nilai_data']) ?>
                             </td>
-
                             <td>
                                 <span class="evidence">
                                     <?= htmlspecialchars($row['foto_path'] ?? '-') ?>
