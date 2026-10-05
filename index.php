@@ -244,18 +244,78 @@ try {
     $offset = ($page - 1) * $perPage;
 
     $chartStmt = $pdo->prepare("
-        SELECT
-            id,
-            tanggal,
-            jam,
-            nilai_data
+        SELECT id, tanggal, jam, nilai_data
         FROM counter_readings
         $whereSql
         ORDER BY tanggal DESC, jam DESC, id DESC
-        LIMIT 100
+        LIMIT 5000
     ");
     $chartStmt->execute($params);
     $chartDataRows = array_reverse($chartStmt->fetchAll());
+
+    $trendBuckets = [];
+    foreach ($chartDataRows as $row) {
+        $date = new DateTimeImmutable((string) $row['tanggal']);
+        $bucketStart = match ($trendPeriod) {
+            'mingguan' => $date->modify('monday this week'),
+            'bulanan' => $date->modify('first day of this month'),
+            default => $date,
+        };
+        $bucketKey = $bucketStart->format('Y-m-d');
+
+        if (!isset($trendBuckets[$bucketKey])) {
+            $trendBuckets[$bucketKey] = [
+                'label' => $trendPeriod === 'bulanan'
+                    ? $bucketStart->format('Y-m')
+                    : ($trendPeriod === 'mingguan'
+                        ? 'Minggu ' . $bucketStart->format('d/m/Y')
+                        : $bucketStart->format('d/m/Y')),
+                'count' => 0,
+                'sum' => 0.0,
+                'min' => (float) $row['nilai_data'],
+                'max' => (float) $row['nilai_data'],
+                'first' => (float) $row['nilai_data'],
+                'last' => (float) $row['nilai_data'],
+            ];
+        }
+
+        $value = (float) $row['nilai_data'];
+        $trendBuckets[$bucketKey]['count']++;
+        $trendBuckets[$bucketKey]['sum'] += $value;
+        $trendBuckets[$bucketKey]['min'] = min($trendBuckets[$bucketKey]['min'], $value);
+        $trendBuckets[$bucketKey]['max'] = max($trendBuckets[$bucketKey]['max'], $value);
+        $trendBuckets[$bucketKey]['last'] = $value;
+    }
+
+    $trendData = [];
+    foreach ($trendBuckets as $bucket) {
+        $trendData[] = [
+            'label' => $bucket['label'],
+            'count' => $bucket['count'],
+            'average' => $bucket['sum'] / $bucket['count'],
+            'min' => $bucket['min'],
+            'max' => $bucket['max'],
+            'first' => $bucket['first'],
+            'last' => $bucket['last'],
+        ];
+    }
+
+    $trendCount = count($trendData);
+    $trendTotalCount = array_sum(array_column($trendData, 'count'));
+    $trendTotalSum = 0.0;
+    foreach ($trendData as $period) {
+        $trendTotalSum += $period['average'] * $period['count'];
+    }
+    $trendAverage = $trendTotalCount > 0 ? $trendTotalSum / $trendTotalCount : null;
+    $trendMin = $trendCount > 0 ? min(array_column($trendData, 'min')) : null;
+    $trendMax = $trendCount > 0 ? max(array_column($trendData, 'max')) : null;
+    $trendFirst = $trendCount > 0 ? $trendData[0]['first'] : null;
+    $trendLast = $trendCount > 0 ? $trendData[$trendCount - 1]['last'] : null;
+    $trendChange = ($trendFirst !== null && $trendLast !== null) ? $trendLast - $trendFirst : null;
+    $trendPercent = ($trendChange !== null && $trendFirst != 0) ? ($trendChange / abs($trendFirst)) * 100 : null;
+    $trendDirection = $trendChange === null
+        ? 'Belum cukup data'
+        : ($trendChange > 0 ? 'Cenderung naik' : ($trendChange < 0 ? 'Cenderung turun' : 'Relatif stabil'));
 
     $dataStmt = $pdo->prepare("
         SELECT
@@ -274,8 +334,8 @@ try {
     $dataStmt->execute($params);
     $data = $dataStmt->fetchAll();
 
-    $latestRow = $chartDataRows[0] ?? null;
-    $previousRow = $chartDataRows[1] ?? null;
+    $latestRow = $chartDataRows[count($chartDataRows) - 1] ?? null;
+    $previousRow = $chartDataRows[count($chartDataRows) - 2] ?? null;
     $latestValue = $latestRow['nilai_data'] ?? 0;
     $previousValue = $previousRow['nilai_data'] ?? null;
     $valueChange = $previousValue !== null
