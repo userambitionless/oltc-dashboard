@@ -466,3 +466,17 @@ tbody tr:hover {
     stroke: var(--primary);
     stroke-width: 3;
 }
+
+
+/* Reading change indicator */
+.change-up {
+    color: #15803d;
+}
+
+.change-down {
+    color: #b91c1c;
+}
+
+.change-neutral {
+    color: #475569;
+}
