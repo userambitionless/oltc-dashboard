@@ -80,7 +80,7 @@ Contoh:
   "data": {
     "id": 6,
     "tanggal": "2026-10-05",
-    "hari": null,
+    "hari": "Senin",
     "jam": "12:30:00",
     "nilai_data": 140.5,
     "foto_path": null
@@ -88,7 +88,7 @@ Contoh:
 }
 ```
 
-Catatan: `hari` saat ini dikembalikan `null` karena nilai hari dibuat otomatis oleh database. Ini dapat disempurnakan pada tahap berikutnya.
+Catatan: `hari` dibaca kembali dari database setelah insert sehingga nilai hari yang dihasilkan database ikut dikembalikan pada response.
 
 ## HTTP status
 
@@ -144,3 +144,21 @@ API Key tidak boleh:
 - dibagikan di screenshot atau dokumentasi publik.
 
 Untuk deployment yang dapat diakses dari jaringan luar, tambahkan HTTPS dan kontrol akses/rate limiting sebelum API digunakan oleh perangkat nyata.
+
+
+## Audit sumber data
+
+Setiap pembacaan memiliki kolom `source`:
+
+| Nilai | Arti |
+|---|---|
+| `api` | Data masuk melalui endpoint API |
+| `manual` | Data pernah diperbarui melalui form edit dashboard |
+
+Pembacaan baru dari endpoint API ditandai sebagai `api`. Jika operator mengubah tanggal, jam, atau nilai melalui dashboard, record tersebut berubah menjadi `manual`. Evidence foto tidak diubah oleh proses edit manual.
+
+Migrasi database untuk fitur ini tersedia di:
+
+`database/002_add_reading_source.sql`
+
+Jalankan migrasi tersebut **sekali** sebelum menggunakan fitur edit manual.
