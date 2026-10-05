@@ -173,9 +173,9 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
 try {
     $stmt = $pdo->prepare("
         INSERT INTO counter_readings
-            (tanggal, jam, nilai_data, foto_path)
+            (tanggal, jam, nilai_data, foto_path, source)
         VALUES
-            (:tanggal, :jam, :nilai_data, :foto_path)
+            (:tanggal, :jam, :nilai_data, :foto_path, 'api')
     ");
 
     $stmt->execute([
