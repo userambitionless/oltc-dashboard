@@ -440,6 +440,14 @@ function evidenceUrl(?string $path): ?string
 
 <body>
 
+
+<a class="home-metal-button" href="index.php" aria-label="Home" title="Home">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3.5 10.7 12 3.8l8.5 6.9v8.1a1.7 1.7 0 0 1-1.7 1.7H5.2a1.7 1.7 0 0 1-1.7-1.7v-8.1Z"></path>
+        <path d="M9.1 20.5v-5.2h5.8v5.2"></path>
+    </svg>
+</a>
+
 <div class="page">
 
     <header class="header">
