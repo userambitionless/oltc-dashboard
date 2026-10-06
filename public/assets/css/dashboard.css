@@ -175,7 +175,7 @@ button, input { font: inherit; }
 .brand-logos {
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 16px;
     margin: 0 0 13px;
 }
 
@@ -191,13 +191,13 @@ button, input { font: inherit; }
 }
 
 .oltc-logo {
-    width: 156px;
+    display: block;
+    width: 64px;
     height: 64px;
-    flex: 0 0 156px;
-    background-image: url("../../favicon2.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 253px 253px;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 0;
+    background: transparent;
 }
 
 .brand-copy {
@@ -910,7 +910,7 @@ td:nth-child(7) {
     }
 
     .brand-logos {
-        gap: 16px;
+        gap: 12px;
         margin-bottom: 11px;
     }
 
@@ -920,10 +920,8 @@ td:nth-child(7) {
     }
 
     .oltc-logo {
-        width: 124px;
+        width: 50px;
         height: 50px;
-        flex-basis: 124px;
-        background-size: 198px 198px;
     }
 
     .brand-copy h1 {
@@ -1677,7 +1675,7 @@ td:nth-child(7) {
     }
 
     .brand-logos {
-        gap: 14px;
+        gap: 12px;
         margin-bottom: 10px;
     }
 
@@ -1687,10 +1685,8 @@ td:nth-child(7) {
     }
 
     .oltc-logo {
-        width: min(124px, 38vw);
+        width: 50px;
         height: 50px;
-        flex-basis: min(124px, 38vw);
-        background-size: 198px 198px;
     }
 
     .brand-copy h1 {
@@ -1957,7 +1953,7 @@ td:nth-child(7) {
     }
 
     .brand-logos {
-        gap: 10px;
+        gap: 9px;
     }
 
     .pln-logo {
@@ -1966,10 +1962,8 @@ td:nth-child(7) {
     }
 
     .oltc-logo {
-        width: min(108px, 33vw);
+        width: 44px;
         height: 44px;
-        flex-basis: min(108px, 33vw);
-        background-size: 172px 172px;
     }
 
     .brand-copy h1 {
