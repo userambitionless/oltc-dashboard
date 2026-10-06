@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image/jpeg" href="favicon.jpg">
-    <link rel="shortcut icon" type="image/jpeg" href="favicon.jpg">
+    <link rel="icon" type="image/png" href="favicon2.png">
+    <link rel="shortcut icon" type="image/png" href="favicon2.png">
     <title>Login · OLTC Dashboard</title>
     <link rel="stylesheet" href="public/assets/css/auth.css">
 </head>
