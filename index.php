@@ -498,8 +498,13 @@ function evidenceUrl(?string $path): ?string
 
         <article class="card stat-card">
             <div class="stat-label">Pembacaan Terakhir</div>
-            <div class="stat-value">
-                <?= $latestDateTime ? htmlspecialchars($latestDateTime) : '-' ?>
+            <div class="stat-value stat-datetime">
+                <?php if ($latestDateTime): ?>
+                    <span><?= htmlspecialchars($latestRow['tanggal']) ?></span>
+                    <span class="stat-time"><?= htmlspecialchars($latestRow['jam']) ?></span>
+                <?php else: ?>
+                    <span>-</span>
+                <?php endif; ?>
             </div>
             <div class="stat-meta">
                 Data terbaru sesuai filter
