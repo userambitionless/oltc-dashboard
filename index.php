@@ -974,9 +974,7 @@ function evidenceUrl(?string $path): ?string
             return padding.top + ((maxValue - value) / (maxValue - minValue)) * plotHeight;
         };
 
-        const formatValue = (value) => Number(value).toLocaleString('id-ID', {
-            maximumFractionDigits: 0
-        });
+        const formatValue = (value) => String(Math.round(Number(value)));
 
         const formatLabel = (label) => {
             const parts = label.split(' ');
