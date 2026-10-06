@@ -939,7 +939,11 @@ function evidenceUrl(?string $path): ?string
 
         const formatValue = (value) => String(Math.round(Number(value)));
 
-        const formatLabel = (label) => label || '';
+        const formatLabel = (label) => {
+            if (!label) return '';
+            const match = String(label).match(/#(\d+)$/);
+            return match ? '#' + match[1] : label;
+        };
 
         const gridCount = 5;
         let markup = '<title id="counterChartTitle">Trend pembacaan counter OLTC</title><desc id="counterChartDescription">Grafik menunjukkan perubahan nilai counter berdasarkan pembacaan terbaru sesuai filter yang dipilih.</desc>';
