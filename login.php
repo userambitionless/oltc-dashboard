@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="icon" type="image/png" href="favicon2.png">
     <link rel="shortcut icon" type="image/png" href="favicon2.png">
     <title>Login · OLTC Dashboard</title>
-    <link rel="stylesheet" href="public/assets/css/auth.css">
+    <link rel="stylesheet" href="public/assets/css/auth.css?v=<?= filemtime(__DIR__ . '/public/assets/css/auth.css') ?>">
 </head>
 <body>
 <main class="auth-page">
