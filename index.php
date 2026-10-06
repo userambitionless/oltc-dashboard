@@ -228,10 +228,7 @@ $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 try {
     $countStmt = $pdo->prepare("
         SELECT
-            COUNT(*) AS total_data,
-            MIN(nilai_data) AS min_value,
-            MAX(nilai_data) AS max_value,
-            AVG(nilai_data) AS avg_value
+            COUNT(*) AS total_data
         FROM counter_readings
         $whereSql
     ");
@@ -274,8 +271,7 @@ try {
                 'sum' => 0.0,
                 'min' => (float) $row['nilai_data'],
                 'max' => (float) $row['nilai_data'],
-                'first' => (float) $row['nilai_data'],
-                'last' => (float) $row['nilai_data'],
+
             ];
         }
 
@@ -284,7 +280,6 @@ try {
         $trendBuckets[$bucketKey]['sum'] += $value;
         $trendBuckets[$bucketKey]['min'] = min($trendBuckets[$bucketKey]['min'], $value);
         $trendBuckets[$bucketKey]['max'] = max($trendBuckets[$bucketKey]['max'], $value);
-        $trendBuckets[$bucketKey]['last'] = $value;
     }
 
     $trendData = [];
@@ -295,27 +290,12 @@ try {
             'average' => $bucket['sum'] / $bucket['count'],
             'min' => $bucket['min'],
             'max' => $bucket['max'],
-            'first' => $bucket['first'],
-            'last' => $bucket['last'],
+
         ];
     }
 
     $trendCount = count($trendData);
-    $trendTotalCount = array_sum(array_column($trendData, 'count'));
-    $trendTotalSum = 0.0;
-    foreach ($trendData as $period) {
-        $trendTotalSum += $period['average'] * $period['count'];
-    }
-    $trendAverage = $trendTotalCount > 0 ? $trendTotalSum / $trendTotalCount : null;
-    $trendMin = $trendCount > 0 ? min(array_column($trendData, 'min')) : null;
-    $trendMax = $trendCount > 0 ? max(array_column($trendData, 'max')) : null;
-    $trendFirst = $trendCount > 0 ? $trendData[0]['first'] : null;
-    $trendLast = $trendCount > 0 ? $trendData[$trendCount - 1]['last'] : null;
-    $trendChange = ($trendFirst !== null && $trendLast !== null) ? $trendLast - $trendFirst : null;
-    $trendPercent = ($trendChange !== null && $trendFirst != 0) ? ($trendChange / abs($trendFirst)) * 100 : null;
-
     // Arah trend menggunakan maksimal 3 pembacaan aktual paling terakhir.
-    // Ini berbeda dari perubahan keseluruhan periode yang tetap memakai data trend agregat.
     $recentTrendRows = array_slice($chartDataRows, -3);
     $recentTrendValues = array_map(
         static fn (array $row): float => (float) $row['nilai_data'],
@@ -378,12 +358,7 @@ try {
     $data = $dataStmt->fetchAll();
 
     $latestRow = $chartDataRows[count($chartDataRows) - 1] ?? null;
-    $previousRow = $chartDataRows[count($chartDataRows) - 2] ?? null;
     $latestValue = $latestRow['nilai_data'] ?? 0;
-    $previousValue = $previousRow['nilai_data'] ?? null;
-    $valueChange = $previousValue !== null
-        ? (float) $latestValue - (float) $previousValue
-        : null;
 
 } catch (PDOException $e) {
     die("Gagal mengambil data: " . $e->getMessage());
@@ -392,9 +367,6 @@ try {
 $totalData = (int) ($stats['total_data'] ?? 0);
 $tableStart = $totalData > 0 ? $offset + 1 : 0;
 $tableEnd = min($offset + $perPage, $totalData);
-$minValue = $stats['min_value'] ?? null;
-$maxValue = $stats['max_value'] ?? null;
-$avgValue = $stats['avg_value'] ?? null;
 $latestDateTime = $latestRow
     ? ($latestRow['tanggal'] . ' ' . $latestRow['jam'])
     : null;
