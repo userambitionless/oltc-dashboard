@@ -356,6 +356,17 @@ try {
         ))
         : 'Belum cukup data';
 
+    $recentTrendDateTimes = $recentTrendCount > 0
+        ? implode(' → ', array_map(
+            static function (array $row): string {
+                $date = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $row['tanggal']);
+                $dateLabel = $date ? $date->format('d/m/Y') : (string) $row['tanggal'];
+                return $dateLabel . ' ' . substr((string) $row['jam'], 0, 8);
+            },
+            $recentTrendRows
+        ))
+        : 'Belum cukup data';
+
     $trendDirectionClass = str_contains($trendDirection, 'naik')
         ? 'change-up'
         : (str_contains($trendDirection, 'turun') ? 'change-down' : 'change-neutral');
@@ -707,7 +718,12 @@ function evidenceUrl(?string $path): ?string
                 <div class="trend-metrics">
                     <div class="trend-metric"><span>Periode</span><strong><?= number_format($trendCount, 0, ',', '.') ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
                     <div class="trend-metric"><span>Perubahan</span><strong class="<?= $trendChange > 0 ? 'change-up' : ($trendChange < 0 ? 'change-down' : 'change-neutral') ?>"><?= $trendChange > 0 ? '+' : '' ?><?= number_format((float) $trendChange, 3, ',', '.') ?></strong><small><?= $trendPercent !== null ? ($trendPercent > 0 ? '+' : '') . number_format($trendPercent, 2, ',', '.') . '%' : 'Persentase tidak tersedia' ?></small></div>
-                    <div class="trend-metric"><span>Arah Trend</span><strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong><small><?= htmlspecialchars($recentTrendSummary) ?></small></div>
+                    <div class="trend-metric">
+                        <span>Arah Trend</span>
+                        <strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong>
+                        <small>Nilai: <?= htmlspecialchars($recentTrendSummary) ?></small>
+                        <small class="trend-realtime">Waktu: <?= htmlspecialchars($recentTrendDateTimes) ?></small>
+                    </div>
                 </div>
                 <div class="chart-wrap">
                     <svg id="counterChart" class="counter-chart" role="img" aria-labelledby="counterChartTitle counterChartDescription"></svg>
