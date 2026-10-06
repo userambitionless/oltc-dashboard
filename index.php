@@ -113,11 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             && ($timeErrors === false || ($timeErrors['warning_count'] === 0 && $timeErrors['error_count'] === 0))
             && $time->format('H:i:s') === $jam;
 
-        if (!$validDate || !$validTime || !is_numeric($nilaiDataInput) || !is_finite((float) $nilaiDataInput)) {
+        if (!$validDate || !$validTime || !preg_match('/^\d+$/', $nilaiDataInput)) {
             redirectWithMessage('edit_error=Data%20tanggal%2C%20jam%2C%20atau%20nilai%20tidak%20valid');
         }
 
-        $nilaiData = (float) $nilaiDataInput;
+        $nilaiData = (int) $nilaiDataInput;
 
         if (abs($nilaiData) > 999999999.999) {
             redirectWithMessage('edit_error=Nilai%20counter%20berada%20di%20luar%20batas%20yang%20didukung');
@@ -351,7 +351,7 @@ try {
 
     $recentTrendSummary = $recentTrendCount > 0
         ? implode(' → ', array_map(
-            static fn (float $value): string => number_format($value, 3, ',', '.'),
+            static fn (float $value): string => (string) (int) $value,
             $recentTrendValues
         ))
         : 'Belum cukup data';
@@ -512,7 +512,7 @@ function evidenceUrl(?string $path): ?string
         <article class="card stat-card">
             <div class="stat-label">Nilai Terbaru</div>
             <div class="stat-value">
-                <?= htmlspecialchars((string) $latestValue) ?>
+                <?= htmlspecialchars((string) (int) $latestValue) ?>
             </div>
             <div class="stat-meta">
                 Hasil pembacaan terakhir
@@ -570,7 +570,7 @@ function evidenceUrl(?string $path): ?string
                     type="number"
                     id="min_value"
                     name="min_value"
-                    step="0.001"
+                    step="1"
                     value="<?= htmlspecialchars($filterMinValue) ?>"
                     placeholder="Contoh: 100"
                 >
@@ -639,7 +639,7 @@ function evidenceUrl(?string $path): ?string
         <div><span>Hari</span><strong><?= htmlspecialchars((string) $detailRecord['hari']) ?></strong></div>
         <div><span>Tanggal</span><strong><?= htmlspecialchars((string) $detailRecord['tanggal']) ?></strong></div>
         <div><span>Jam</span><strong><?= htmlspecialchars((string) $detailRecord['jam']) ?></strong></div>
-        <div><span>Nilai Counter</span><strong><?= htmlspecialchars(number_format((float) $detailRecord['nilai_data'], 3, ',', '.')) ?></strong></div>
+        <div><span>Nilai Counter</span><strong><?= htmlspecialchars((int) $detailRecord['nilai_data']) ?></strong></div>
         <div><span>Sumber Data</span><strong><?= ($detailRecord['source'] ?? 'api') === 'manual' ? 'Manual' : 'API' ?></strong></div>
         <div><span>Dibuat</span><strong><?= htmlspecialchars((string) $detailRecord['created_at']) ?></strong></div>
         <div><span>Diperbarui</span><strong><?= htmlspecialchars((string) $detailRecord['updated_at']) ?></strong></div>
@@ -719,7 +719,7 @@ function evidenceUrl(?string $path): ?string
         <?php else: ?>
             <div class="trend-analysis">
                 <div class="trend-metrics">
-                    <div class="trend-metric"><span>Periode</span><strong><?= number_format($trendCount, 0, ',', '.') ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
+                    <div class="trend-metric"><span>Periode</span><strong><?= (string) $trendCount ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
                     <div class="trend-metric">
                         <span>Arah Trend</span>
                         <strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong>
@@ -736,7 +736,7 @@ function evidenceUrl(?string $path): ?string
                         <?php foreach ($trendData as $period): ?>
                             <tr>
                                 <td><?= htmlspecialchars($period['label']) ?></td>
-                                <td><span class="trend-count"><?= number_format($period['count'], 0, ',', '.') ?> data</span></td>
+                                <td><span class="trend-count"><?= (string) $period['count'] ?> data</span></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -809,7 +809,7 @@ function evidenceUrl(?string $path): ?string
                             <td><?= htmlspecialchars($row['tanggal']) ?></td>
                             <td class="time"><?= htmlspecialchars($row['jam']) ?></td>
                             <td class="value">
-                                <?= htmlspecialchars($row['nilai_data']) ?>
+                                <?= htmlspecialchars((string) (int) $row['nilai_data']) ?>
                             </td>
                             <td>
                                 <?php $photoUrl = evidenceUrl($row['foto_path']); ?>
@@ -970,8 +970,7 @@ function evidenceUrl(?string $path): ?string
         };
 
         const formatValue = (value) => Number(value).toLocaleString('id-ID', {
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 3
+            maximumFractionDigits: 0
         });
 
         const formatLabel = (label) => {
