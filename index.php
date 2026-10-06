@@ -693,7 +693,7 @@ function evidenceUrl(?string $path): ?string
         <?php else: ?>
             <div class="trend-analysis">
                 <div class="trend-metrics">
-                    <div class="trend-metric"><span>Total Pembacaan</span><strong><?= formatCounterValue($trendCount) ?></strong><small>Setiap data = 1 titik</small></div>
+                    <div class="trend-metric"><span>Total Pembacaan</span><strong><?= formatCounterValue($trendCount) ?></strong><small>Data Perubahan</small></div>
                     <div class="trend-metric">
                         <span>Arah Trend</span>
                         <strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong>
