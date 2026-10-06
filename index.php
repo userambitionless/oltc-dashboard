@@ -313,9 +313,52 @@ try {
     $trendLast = $trendCount > 0 ? $trendData[$trendCount - 1]['last'] : null;
     $trendChange = ($trendFirst !== null && $trendLast !== null) ? $trendLast - $trendFirst : null;
     $trendPercent = ($trendChange !== null && $trendFirst != 0) ? ($trendChange / abs($trendFirst)) * 100 : null;
-    $trendDirection = $trendChange === null
-        ? 'Belum cukup data'
-        : ($trendChange > 0 ? 'Cenderung naik' : ($trendChange < 0 ? 'Cenderung turun' : 'Relatif stabil'));
+
+    // Arah trend menggunakan maksimal 3 pembacaan aktual paling terakhir.
+    // Ini berbeda dari perubahan keseluruhan periode yang tetap memakai data trend agregat.
+    $recentTrendRows = array_slice($chartDataRows, -3);
+    $recentTrendValues = array_map(
+        static fn (array $row): float => (float) $row['nilai_data'],
+        $recentTrendRows
+    );
+    $recentTrendCount = count($recentTrendValues);
+    $recentTrendFirst = $recentTrendCount > 0 ? $recentTrendValues[0] : null;
+    $recentTrendLast = $recentTrendCount > 0 ? $recentTrendValues[$recentTrendCount - 1] : null;
+
+    if ($recentTrendCount < 2) {
+        $trendDirection = 'Belum cukup data';
+    } elseif ($recentTrendCount === 2) {
+        $recentChange = $recentTrendValues[1] - $recentTrendValues[0];
+        $trendDirection = $recentChange > 0
+            ? 'Cenderung naik'
+            : ($recentChange < 0 ? 'Cenderung turun' : 'Relatif stabil');
+    } else {
+        $firstRecent = $recentTrendValues[0];
+        $middleRecent = $recentTrendValues[1];
+        $lastRecent = $recentTrendValues[2];
+
+        if ($lastRecent > $middleRecent && $middleRecent > $firstRecent) {
+            $trendDirection = 'Cenderung naik';
+        } elseif ($lastRecent < $middleRecent && $middleRecent < $firstRecent) {
+            $trendDirection = 'Cenderung turun';
+        } else {
+            $recentNetChange = $lastRecent - $firstRecent;
+            $trendDirection = $recentNetChange > 0
+                ? 'Cenderung naik'
+                : ($recentNetChange < 0 ? 'Cenderung turun' : 'Berfluktuasi');
+        }
+    }
+
+    $recentTrendSummary = $recentTrendCount > 0
+        ? implode(' → ', array_map(
+            static fn (float $value): string => number_format($value, 3, ',', '.'),
+            $recentTrendValues
+        ))
+        : 'Belum cukup data';
+
+    $trendDirectionClass = str_contains($trendDirection, 'naik')
+        ? 'change-up'
+        : (str_contains($trendDirection, 'turun') ? 'change-down' : 'change-neutral');
 
     $dataStmt = $pdo->prepare("
         SELECT
@@ -664,7 +707,7 @@ function evidenceUrl(?string $path): ?string
                 <div class="trend-metrics">
                     <div class="trend-metric"><span>Periode</span><strong><?= number_format($trendCount, 0, ',', '.') ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
                     <div class="trend-metric"><span>Perubahan</span><strong class="<?= $trendChange > 0 ? 'change-up' : ($trendChange < 0 ? 'change-down' : 'change-neutral') ?>"><?= $trendChange > 0 ? '+' : '' ?><?= number_format((float) $trendChange, 3, ',', '.') ?></strong><small><?= $trendPercent !== null ? ($trendPercent > 0 ? '+' : '') . number_format($trendPercent, 2, ',', '.') . '%' : 'Persentase tidak tersedia' ?></small></div>
-                    <div class="trend-metric"><span>Arah Trend</span><strong class="<?= $trendChange > 0 ? 'change-up' : ($trendChange < 0 ? 'change-down' : 'change-neutral') ?>"><?= htmlspecialchars($trendDirection) ?></strong><small><?= $trendFirst !== null && $trendLast !== null ? number_format($trendFirst, 3, ',', '.') . ' → ' . number_format($trendLast, 3, ',', '.') : 'Belum cukup data' ?></small></div>
+                    <div class="trend-metric"><span>Arah Trend</span><strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong><small><?= htmlspecialchars($recentTrendSummary) ?></small></div>
                 </div>
                 <div class="chart-wrap">
                     <svg id="counterChart" class="counter-chart" role="img" aria-labelledby="counterChartTitle counterChartDescription"></svg>
