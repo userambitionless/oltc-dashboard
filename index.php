@@ -243,7 +243,6 @@ try {
         FROM counter_readings
         $whereSql
         ORDER BY id ASC
-        LIMIT 5000
     ");
     $chartStmt->execute($params);
     $chartDataRows = $chartStmt->fetchAll();
