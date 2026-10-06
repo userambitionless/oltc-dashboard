@@ -65,9 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main class="auth-page">
     <section class="auth-card">
         <div class="auth-header">
-            <p class="eyebrow">MONITORING SYSTEM</p>
-            <h1>OLTC Dashboard</h1>
-            <p>Masuk untuk mengakses monitoring dan riwayat pembacaan counter.</p>
+            <div class="auth-logos">
+                <img class="auth-pln-logo" src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png" alt="Logo PLN">
+                <img class="auth-oltc-logo" src="favicon2.png" alt="Logo OLTC">
+            </div>
+            <div class="auth-system-badge"><span></span> MONITORING SYSTEM</div>
+            <h1>OLTC Counter Dashboard</h1>
+            <p>Masuk untuk mengakses monitoring dan riwayat pembacaan counter OLTC.</p>
         </div>
 
         <?php if ($error !== ''): ?>
@@ -87,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input id="password" name="password" type="password" autocomplete="current-password" required>
             </div>
 
-            <button class="auth-button" type="submit">Masuk</button>
+            <button class="auth-button" type="submit"><span>Masuk ke Dashboard</span><span class="auth-button-arrow">→</span></button>
         </form>
 
         <div class="auth-footer">OLTC Dashboard · <?= date('Y') ?></div>
