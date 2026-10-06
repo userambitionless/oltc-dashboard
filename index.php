@@ -376,6 +376,21 @@ function formatCounterValue(float|int|string $value): string
     return number_format((float) $value, 0, '', '');
 }
 
+function formatEnglishDate(?string $date): string
+{
+    if (!$date) {
+        return '-';
+    }
+
+    $dateObject = DateTime::createFromFormat('!Y-m-d', $date);
+
+    if (!$dateObject) {
+        return $date;
+    }
+
+    return $dateObject->format('j F Y');
+}
+
 function evidenceUrl(?string $path): ?string
 {
     if (!$path) {
@@ -468,7 +483,7 @@ function evidenceUrl(?string $path): ?string
             </div>
             <?php if ($latestDateTime): ?>
                 <div class="header-meta">
-                    Latest&nbsp;&nbsp;<?= htmlspecialchars($latestDateTime) ?>
+                    Latest&nbsp;&nbsp;<?= htmlspecialchars(formatEnglishDate($latestRow['tanggal']) . ' ' . $latestRow['jam']) ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -500,7 +515,7 @@ function evidenceUrl(?string $path): ?string
             <div class="stat-label">Pembacaan Terakhir</div>
             <div class="stat-value stat-datetime">
                 <?php if ($latestDateTime): ?>
-                    <span><?= htmlspecialchars($latestRow['tanggal']) ?></span>
+                    <span><?= htmlspecialchars(formatEnglishDate($latestRow['tanggal'])) ?></span>
                     <span class="stat-time"><?= htmlspecialchars($latestRow['jam']) ?></span>
                 <?php else: ?>
                     <span>-</span>
@@ -788,7 +803,7 @@ function evidenceUrl(?string $path): ?string
                         <tr>
                             <td><?= htmlspecialchars($row['id']) ?></td>
                             <td><?= htmlspecialchars($row['hari']) ?></td>
-                            <td><?= htmlspecialchars($row['tanggal']) ?></td>
+                            <td><?= htmlspecialchars(formatEnglishDate($row['tanggal'])) ?></td>
                             <td class="time"><?= htmlspecialchars($row['jam']) ?></td>
                             <td class="value">
                                 <?= htmlspecialchars(formatCounterValue($row['nilai_data'])) ?>
@@ -801,7 +816,7 @@ function evidenceUrl(?string $path): ?string
                                         type="button"
                                         class="evidence-button"
                                         data-image="<?= htmlspecialchars($photoUrl) ?>"
-                                        data-caption="ID <?= htmlspecialchars($row['id']) ?> · <?= htmlspecialchars($row['tanggal']) ?> <?= htmlspecialchars($row['jam']) ?>"
+                                        data-caption="ID <?= htmlspecialchars($row['id']) ?> · <?= htmlspecialchars(formatEnglishDate($row['tanggal'])) ?> <?= htmlspecialchars($row['jam']) ?>"
                                     >
                                         <img
                                             class="evidence-thumb"
@@ -1029,7 +1044,7 @@ function evidenceUrl(?string $path): ?string
         const currentHourMinute = getPart('hour') + ':' + getPart('minute');
         const currentSeconds = ':' + getPart('second');
 
-        const dateLabel = new Intl.DateTimeFormat('id-ID', {
+        const dateLabel = new Intl.DateTimeFormat('en-GB', {
             timeZone: 'Asia/Jakarta',
             weekday: 'long',
             day: '2-digit',
