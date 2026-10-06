@@ -94,9 +94,9 @@ body::after {
         70% 8%;
     background-repeat: no-repeat;
     filter: blur(9px);
-    opacity: 0.72;
+    opacity: 0.88;
     will-change: background-position;
-    animation: ambientOrbRoam 52s cubic-bezier(.45, .05, .25, .95) infinite alternate;
+    animation: ambientOrbRoam 28s cubic-bezier(.45, .05, .25, .95) infinite alternate;
 }
 
 @keyframes ambientOrbRoam {
@@ -316,17 +316,17 @@ h1 {
 }
 
 .realtime-seconds.is-ticking {
-    animation: realtimeTick .24s ease-out;
+    animation: realtimeTick .32s ease-out;
 }
 
 @keyframes realtimeTick {
     0% {
-        opacity: .55;
-        transform: translateY(1px) scale(.97);
+        opacity: .45;
+        transform: translateY(1px) scale(.93);
     }
     100% {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0) scale(1.03);
     }
 }
 
