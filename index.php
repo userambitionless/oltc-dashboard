@@ -433,7 +433,7 @@ function evidenceUrl(?string $path): ?string
 
     <title>OLTC Monitoring Dashboard</title>
 
-    <link rel="stylesheet" href="public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="public/assets/css/dashboard.css?v=<?= filemtime(__DIR__ . '/public/assets/css/dashboard.css') ?>">
 </head>
 
 <body>
