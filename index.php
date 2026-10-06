@@ -192,7 +192,7 @@ $filterMinValue = $_GET['min_value'] ?? '';
 $filterMaxValue = $_GET['max_value'] ?? '';
 $page = isset($_GET['page']) && ctype_digit((string) $_GET['page']) ? (int) $_GET['page'] : 1;
 $page = max(1, $page);
-$perPage = 20;
+$perPage = 10;
 
 $where = [];
 $params = [];
