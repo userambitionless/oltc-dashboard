@@ -356,17 +356,6 @@ try {
         ))
         : 'Belum cukup data';
 
-    $recentTrendDateTimes = $recentTrendCount > 0
-        ? implode(' → ', array_map(
-            static function (array $row): string {
-                $date = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $row['tanggal']);
-                $dateLabel = $date ? $date->format('d/m/Y') : (string) $row['tanggal'];
-                return $dateLabel . ' ' . substr((string) $row['jam'], 0, 8);
-            },
-            $recentTrendRows
-        ))
-        : 'Belum cukup data';
-
     $trendDirectionClass = str_contains($trendDirection, 'naik')
         ? 'change-up'
         : (str_contains($trendDirection, 'turun') ? 'change-down' : 'change-neutral');
@@ -470,6 +459,11 @@ function evidenceUrl(?string $path): ?string
                 <a class="secondary-button" href="users.php">Manajemen User</a>
             </div>
         <?php endif; ?>
+            <div class="header-meta header-realtime">
+                <span class="realtime-dot"></span>
+                <span class="realtime-label">Waktu Realtime</span>
+                <strong id="realtimeClock" aria-live="polite">Memuat waktu...</strong>
+            </div>
             <?php if ($latestDateTime): ?>
                 <div class="header-meta">
                     Latest&nbsp;&nbsp;<?= htmlspecialchars($latestDateTime) ?>
@@ -722,7 +716,6 @@ function evidenceUrl(?string $path): ?string
                         <span>Arah Trend</span>
                         <strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong>
                         <small>Nilai: <?= htmlspecialchars($recentTrendSummary) ?></small>
-                        <small class="trend-realtime">Waktu: <?= htmlspecialchars($recentTrendDateTimes) ?></small>
                     </div>
                 </div>
                 <div class="chart-wrap">
@@ -1025,6 +1018,34 @@ function evidenceUrl(?string $path): ?string
 
     renderCounterChart();
     window.addEventListener('resize', renderCounterChart);
+
+    function updateRealtimeClock() {
+        const clock = document.getElementById('realtimeClock');
+
+        if (!clock) {
+            return;
+        }
+
+        const now = new Date();
+        const dateLabel = new Intl.DateTimeFormat('id-ID', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        }).format(now);
+
+        const timeLabel = new Intl.DateTimeFormat('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).format(now);
+
+        clock.textContent = dateLabel + ' · ' + timeLabel;
+    }
+
+    updateRealtimeClock();
+    window.setInterval(updateRealtimeClock, 1000);
 
     const imageModal = document.getElementById('imageModal');
     const imageModalPreview = document.getElementById('imageModalPreview');
