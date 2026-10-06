@@ -2041,3 +2041,115 @@ td:nth-child(7) {
         transition-duration: .01ms !important;
     }
 }
+
+
+/* Metallic home button */
+.home-metal-button {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid #7f8b93;
+    border-radius: 50%;
+    background:
+        linear-gradient(145deg, #f8fafb 0%, #cbd1d5 24%, #8d979e 50%, #dfe3e5 76%, #a8b0b5 100%);
+    box-shadow:
+        inset 0 2px 2px rgba(255,255,255,.92),
+        inset 0 -3px 5px rgba(37,48,56,.42),
+        0 5px 12px rgba(23,32,39,.22),
+        0 1px 2px rgba(23,32,39,.16);
+    color: #fff;
+    text-decoration: none;
+    transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+
+.home-metal-button::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(255,255,255,.58);
+    border-radius: 50%;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.72);
+    pointer-events: none;
+}
+
+.home-metal-button svg {
+    position: relative;
+    z-index: 1;
+    width: 27px;
+    height: 27px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter:
+        drop-shadow(0 1px 1px rgba(42,51,57,.65))
+        drop-shadow(0 -1px 0 rgba(255,255,255,.24));
+}
+
+.home-metal-button:hover {
+    transform: translateY(-2px) scale(1.035);
+    filter: brightness(1.045);
+    box-shadow:
+        inset 0 2px 2px rgba(255,255,255,.95),
+        inset 0 -3px 5px rgba(37,48,56,.42),
+        0 8px 18px rgba(23,32,39,.27),
+        0 1px 3px rgba(23,32,39,.18);
+}
+
+.home-metal-button:active {
+    transform: translateY(1px) scale(.98);
+    box-shadow:
+        inset 0 3px 5px rgba(37,48,56,.32),
+        inset 0 -1px 2px rgba(255,255,255,.7),
+        0 3px 7px rgba(23,32,39,.18);
+}
+
+.home-metal-button:focus-visible {
+    outline: 0;
+    box-shadow:
+        0 0 0 3px rgba(20,92,140,.20),
+        inset 0 2px 2px rgba(255,255,255,.92),
+        inset 0 -3px 5px rgba(37,48,56,.42),
+        0 5px 12px rgba(23,32,39,.22);
+}
+
+@media (max-width: 700px) {
+    .home-metal-button {
+        right: 18px;
+        bottom: 18px;
+        width: 52px;
+        height: 52px;
+    }
+
+    .home-metal-button svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 420px) {
+    .home-metal-button {
+        right: 14px;
+        bottom: 14px;
+        width: 48px;
+        height: 48px;
+    }
+
+    .home-metal-button svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-metal-button {
+        transition: none;
+    }
+}
