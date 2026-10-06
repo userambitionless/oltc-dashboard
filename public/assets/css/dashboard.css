@@ -1403,6 +1403,14 @@ td:nth-child(7) {
     white-space: nowrap;
 }
 
+.trend-metric .trend-realtime {
+    margin-top: 3px;
+    color: #8b959c;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9px;
+    letter-spacing: -.01em;
+}
+
 .trend-period-table-wrap {
     overflow-x: auto;
     padding: 0 18px 6px;
