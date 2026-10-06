@@ -437,7 +437,7 @@ function evidenceUrl(?string $path): ?string
             <div class="brand-row">
                 <img
                     class="pln-logo"
-                    src="https://zonalogo.com/assets/logo-pln.webp?asset=885&w=240"
+                    src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png"
                     alt="Logo PLN"
                 >
                 <div class="brand-copy">
