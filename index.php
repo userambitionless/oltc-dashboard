@@ -428,7 +428,7 @@ function evidenceUrl(?string $path): ?string
 
     <title>OLTC Monitoring Dashboard</title>
 
-    <link rel="stylesheet" href="public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="public/assets/css/dashboard.css?v=<?= rawurlencode((string) (filemtime(__DIR__ . '/public/assets/css/dashboard.css') ?: '1')) ?>">
 </head>
 
 <body>
