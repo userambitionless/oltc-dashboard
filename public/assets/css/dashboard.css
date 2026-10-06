@@ -1441,13 +1441,26 @@ td:nth-child(7) {
 /* Trend analysis */
 .trend-header {
     align-items: flex-start;
+    gap: 18px;
+}
+
+.trend-header .data-title {
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.trend-header .data-description {
+    max-width: 720px;
+    line-height: 1.55;
 }
 
 .trend-controls {
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
     align-items: flex-end;
     gap: 6px;
+    margin-left: auto;
 }
 
 .trend-controls > span {
