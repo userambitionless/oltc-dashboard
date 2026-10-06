@@ -2046,8 +2046,10 @@ td:nth-child(7) {
 /* Metallic home button */
 .home-metal-button {
     position: fixed;
-    right: 28px;
-    bottom: 28px;
+    left: 28px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
     z-index: 20;
     display: inline-flex;
     align-items: center;
