@@ -459,10 +459,16 @@ function evidenceUrl(?string $path): ?string
                 <a class="secondary-button" href="users.php">Manajemen User</a>
             </div>
         <?php endif; ?>
-            <div class="header-meta header-realtime">
-                <span class="realtime-dot"></span>
-                <span class="realtime-label">Waktu Realtime</span>
-                <strong id="realtimeClock" aria-live="polite">Memuat waktu...</strong>
+            <div class="header-meta header-realtime" aria-label="Waktu realtime">
+                <div class="realtime-topline">
+                    <span class="realtime-dot"></span>
+                    <span class="realtime-label">Waktu Realtime</span>
+                    <span class="realtime-zone">WIB</span>
+                </div>
+                <div class="realtime-time" aria-live="polite">
+                    <span id="realtimeHourMinute">--:--</span><span id="realtimeSeconds" class="realtime-seconds">:--</span>
+                </div>
+                <div id="realtimeDate" class="realtime-date">Memuat tanggal...</div>
             </div>
             <?php if ($latestDateTime): ?>
                 <div class="header-meta">
@@ -1020,28 +1026,43 @@ function evidenceUrl(?string $path): ?string
     window.addEventListener('resize', renderCounterChart);
 
     function updateRealtimeClock() {
-        const clock = document.getElementById('realtimeClock');
+        const hourMinute = document.getElementById('realtimeHourMinute');
+        const seconds = document.getElementById('realtimeSeconds');
+        const date = document.getElementById('realtimeDate');
 
-        if (!clock) {
+        if (!hourMinute || !seconds || !date) {
             return;
         }
 
         const now = new Date();
+
+        const timeParts = new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).formatToParts(now);
+
+        const getPart = (type) => timeParts.find((part) => part.type === type)?.value ?? '--';
+        const currentHourMinute = getPart('hour') + ':' + getPart('minute');
+        const currentSeconds = ':' + getPart('second');
+
         const dateLabel = new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Jakarta',
             weekday: 'long',
             day: '2-digit',
             month: 'long',
             year: 'numeric'
         }).format(now);
 
-        const timeLabel = new Intl.DateTimeFormat('id-ID', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).format(now);
+        hourMinute.textContent = currentHourMinute;
+        seconds.textContent = currentSeconds;
+        date.textContent = dateLabel;
 
-        clock.textContent = dateLabel + ' · ' + timeLabel;
+        seconds.classList.remove('is-ticking');
+        void seconds.offsetWidth;
+        seconds.classList.add('is-ticking');
     }
 
     updateRealtimeClock();
