@@ -213,12 +213,12 @@ if ($filterEnd !== '') {
     $params['end_date'] = $filterEnd;
 }
 
-if ($filterMinValue !== '' && is_numeric($filterMinValue)) {
+if ($filterMinValue !== '' && preg_match('/^\d+$/', $filterMinValue)) {
     $where[] = 'nilai_data >= :min_value';
     $params['min_value'] = $filterMinValue;
 }
 
-if ($filterMaxValue !== '' && is_numeric($filterMaxValue)) {
+if ($filterMaxValue !== '' && preg_match('/^\d+$/', $filterMaxValue)) {
     $where[] = 'nilai_data <= :max_value';
     $params['max_value'] = $filterMaxValue;
 }
@@ -572,7 +572,7 @@ function evidenceUrl(?string $path): ?string
                     name="min_value"
                     step="1"
                     value="<?= htmlspecialchars($filterMinValue) ?>"
-                    placeholder="Contoh: 100"
+                    placeholder="Contoh: 157387"
                 >
             </div>
 
