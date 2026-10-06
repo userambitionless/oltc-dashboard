@@ -1633,6 +1633,331 @@ td:nth-child(7) {
     }
 }
 
+@media (max-width: 700px) {
+    .page {
+        width: min(100% - 24px, 1480px);
+        padding-top: 88px;
+        padding-bottom: 20px;
+    }
+
+    .header {
+        gap: 18px;
+        padding-bottom: 18px;
+        margin-bottom: 16px;
+    }
+
+    .header-brand {
+        width: 100%;
+    }
+
+    .pln-logo {
+        width: min(140px, 42vw);
+        max-height: 50px;
+        margin-bottom: 10px;
+    }
+
+    .brand-copy h1 {
+        max-width: 100%;
+        font-size: clamp(24px, 8vw, 32px);
+        line-height: .98;
+    }
+
+    .brand-copy .subtitle {
+        max-width: 42rem;
+        margin-top: 9px;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .header-status {
+        width: 100%;
+        align-items: flex-start;
+        gap: 7px;
+    }
+
+    .header-user {
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 2px;
+    }
+
+    .status {
+        width: fit-content;
+        max-width: 100%;
+        min-height: 36px;
+    }
+
+    .header-nav-actions {
+        width: 100%;
+        justify-content: stretch;
+        margin-top: 2px;
+    }
+
+    .header-nav-actions .secondary-button {
+        width: 100%;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+        margin-bottom: 16px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-label {
+        margin-bottom: 9px;
+        font-size: 10px;
+    }
+
+    .stat-value {
+        font-size: clamp(24px, 8vw, 30px);
+    }
+
+    .stat-meta {
+        margin-top: 6px;
+        font-size: 11px;
+        line-height: 1.35;
+    }
+
+    .filter-card,
+    .chart-card {
+        margin-bottom: 14px;
+    }
+
+    .filter-header,
+    .data-header {
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px 16px;
+    }
+
+    .data-title {
+        font-size: 14px;
+    }
+
+    .data-description {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .filter-form {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 14px 16px 16px;
+    }
+
+    .filter-field label {
+        margin-bottom: 5px;
+        font-size: 10px;
+    }
+
+    .filter-field input {
+        height: 42px;
+        font-size: 13px;
+    }
+
+    .filter-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .filter-actions .button {
+        width: 100%;
+        min-height: 42px;
+    }
+
+    .active-filters {
+        padding: 10px 16px 12px;
+    }
+
+    .filter-chip {
+        min-height: 28px;
+        font-size: 9px;
+    }
+
+    .trend-controls {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .trend-periods {
+        width: 100%;
+        gap: 3px;
+    }
+
+    .trend-periods a {
+        flex: 1;
+        min-height: 38px;
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    .trend-metric {
+        padding: 12px 14px;
+    }
+
+    .trend-metric > span {
+        margin-bottom: 5px;
+    }
+
+    .trend-metric strong {
+        font-size: 15px;
+    }
+
+    .trend-metric small {
+        margin-top: 4px;
+        font-size: 9px;
+    }
+
+    .chart-wrap {
+        min-height: 290px;
+        padding: 10px 8px 4px;
+    }
+
+    .counter-chart {
+        height: 290px;
+    }
+
+    .trend-period-table-wrap {
+        padding: 0 10px 6px;
+    }
+
+    .trend-period-table {
+        width: 100%;
+    }
+
+    .trend-period-table th,
+    .trend-period-table td {
+        padding: 10px 10px;
+    }
+
+    .trend-period-table th {
+        font-size: 8px;
+    }
+
+    .trend-period-table td {
+        font-size: 10px;
+    }
+
+    .trend-count {
+        min-width: 68px;
+        min-height: 30px;
+        padding: 4px 8px;
+        font-size: 9px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 820px;
+    }
+
+    th,
+    td {
+        padding: 11px 12px;
+    }
+
+    .evidence-button {
+        width: 52px;
+        height: 42px;
+    }
+
+    .pagination {
+        padding: 12px 12px 15px;
+    }
+
+    .pagination-link {
+        min-width: 38px;
+        min-height: 36px;
+    }
+
+    .image-modal {
+        padding: 12px;
+    }
+
+    .image-modal-content {
+        width: 100%;
+        max-height: calc(100vh - 24px);
+        padding: 8px;
+        border-radius: 9px;
+    }
+
+    .image-modal-content img {
+        max-height: calc(100vh - 82px);
+        border-radius: 5px;
+    }
+
+    .image-modal-close {
+        top: 5px;
+        right: 5px;
+        width: 36px;
+        height: 36px;
+        font-size: 21px;
+    }
+
+    .image-modal-caption {
+        padding: 9px 2px 1px;
+        font-size: 9px;
+    }
+
+    .footer {
+        padding-top: 12px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 420px) {
+    .page {
+        width: calc(100% - 18px);
+        padding-top: 84px;
+    }
+
+    .pln-logo {
+        width: min(124px, 38vw);
+    }
+
+    .brand-copy h1 {
+        font-size: clamp(22px, 7.7vw, 28px);
+    }
+
+    .header-realtime {
+        width: 196px;
+    }
+
+    .realtime-time {
+        font-size: 27px;
+    }
+
+    .realtime-date {
+        font-size: 9px;
+    }
+
+    .filter-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .trend-periods a {
+        font-size: 9px;
+    }
+
+    .trend-period-table th:nth-child(1),
+    .trend-period-table td:nth-child(1) {
+        width: 56%;
+    }
+
+    .trend-period-table th:nth-child(2),
+    .trend-period-table td:nth-child(2) {
+        width: 44%;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     body::after,
     .realtime-seconds.is-ticking {
