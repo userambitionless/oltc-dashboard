@@ -201,47 +201,103 @@ h1 {
 
 .header-realtime {
     position: fixed;
-    top: 14px;
+    top: 12px;
     left: 50%;
     z-index: 1000;
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 7px;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: rgba(251, 252, 252, .96);
-    box-shadow: 0 5px 18px rgba(24, 38, 48, .10);
-    backdrop-filter: blur(8px);
+    width: 218px;
+    padding: 9px 14px 10px;
+    border: 1px solid rgba(203, 213, 220, .95);
+    border-radius: 10px;
+    background: rgba(249, 251, 252, .96);
+    box-shadow: 0 7px 24px rgba(24, 38, 48, .12);
+    backdrop-filter: blur(10px);
+    text-align: center;
     transform: translateX(-50%);
 }
 
+.realtime-topline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 15px;
+}
+
 .realtime-dot {
-    width: 7px;
-    height: 7px;
-    flex: 0 0 7px;
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
     border-radius: 50%;
     background: #29945f;
-    box-shadow: 0 0 0 3px rgba(41,148,95,.10);
+    box-shadow: 0 0 0 3px rgba(41,148,95,.09);
 }
 
 .realtime-label {
-    color: var(--muted);
-    font-size: 9px;
+    color: #7a858d;
+    font-size: 8px;
     font-weight: 700;
-    letter-spacing: .08em;
+    letter-spacing: .12em;
     text-transform: uppercase;
 }
 
-.header-realtime strong {
+.realtime-zone {
+    padding-left: 5px;
+    border-left: 1px solid #d8dfe3;
+    color: #7a858d;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .05em;
+}
+
+.realtime-time {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin-top: 2px;
     color: var(--text);
     font-family: "IBM Plex Mono", monospace;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -.075em;
+    line-height: 1;
     font-variant-numeric: tabular-nums;
 }
+
+.realtime-seconds {
+    display: inline-block;
+    min-width: 39px;
+    color: var(--primary);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -.045em;
+    transform-origin: center bottom;
+}
+
+.realtime-seconds.is-ticking {
+    animation: realtimeTick .24s ease-out;
+}
+
+@keyframes realtimeTick {
+    0% {
+        opacity: .55;
+        transform: translateY(1px) scale(.97);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.realtime-date {
+    margin-top: 4px;
+    color: #879199;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: capitalize;
+}
+
 
 .status {
     display: inline-flex;
@@ -855,12 +911,17 @@ td:nth-child(7) {
 @media (max-width: 700px) {
     .header-realtime {
         top: 10px;
-        left: 50%;
-        right: auto;
-        width: max-content;
-        max-width: calc(100vw - 24px);
-        justify-content: center;
-        transform: translateX(-50%);
+        width: 198px;
+        padding: 8px 12px 9px;
+    }
+
+    .realtime-time {
+        font-size: 27px;
+    }
+
+    .realtime-seconds {
+        min-width: 35px;
+        font-size: 15px;
     }
 
 
