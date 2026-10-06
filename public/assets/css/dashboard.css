@@ -2094,7 +2094,7 @@ td:nth-child(7) {
 }
 
 .home-metal-button:hover {
-    transform: translateY(-2px) scale(1.035);
+    transform: translateY(-50%) scale(1.035);
     filter: brightness(1.045);
     box-shadow:
         inset 0 2px 2px rgba(255,255,255,.95),
@@ -2104,7 +2104,7 @@ td:nth-child(7) {
 }
 
 .home-metal-button:active {
-    transform: translateY(1px) scale(.98);
+    transform: translateY(-50%) scale(.98);
     box-shadow:
         inset 0 3px 5px rgba(37,48,56,.32),
         inset 0 -1px 2px rgba(255,255,255,.7),
@@ -2122,8 +2122,9 @@ td:nth-child(7) {
 
 @media (max-width: 700px) {
     .home-metal-button {
-        right: 18px;
-        bottom: 18px;
+        left: 18px;
+        top: 50%;
+        bottom: auto;
         width: 52px;
         height: 52px;
     }
@@ -2136,8 +2137,9 @@ td:nth-child(7) {
 
 @media (max-width: 420px) {
     .home-metal-button {
-        right: 14px;
-        bottom: 14px;
+        left: 14px;
+        top: 50%;
+        bottom: auto;
         width: 48px;
         height: 48px;
     }
