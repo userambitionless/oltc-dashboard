@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="auth-heading">
-                    <p class="eyebrow">SECURE ACCESS</p>
+                    <p class="eyebrow">LOGIN PAGE OLTC MONITORING</p>
                     <h2>Selamat datang.</h2>
                     <p>Masukkan ID serta Password Anda untuk melanjutkan ke dashboard.</p>
                 </div>
