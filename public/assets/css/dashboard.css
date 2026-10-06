@@ -408,7 +408,7 @@ h1 {
 }
 
 .stat-datetime .stat-time {
-    color: var(--accent);
+    color: var(--text);
     font-size: .72em;
     font-weight: 650;
     letter-spacing: -.01em;
