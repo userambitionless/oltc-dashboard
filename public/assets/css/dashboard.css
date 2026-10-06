@@ -199,6 +199,43 @@ h1 {
     letter-spacing: .01em;
 }
 
+.header-realtime {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: #fbfcfc;
+}
+
+.realtime-dot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: #29945f;
+    box-shadow: 0 0 0 3px rgba(41,148,95,.10);
+}
+
+.realtime-label {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.header-realtime strong {
+    color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
 .status {
     display: inline-flex;
     align-items: center;
@@ -1403,13 +1440,6 @@ td:nth-child(7) {
     white-space: nowrap;
 }
 
-.trend-metric .trend-realtime {
-    margin-top: 3px;
-    color: #8b959c;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 9px;
-    letter-spacing: -.01em;
-}
 
 .trend-period-table-wrap {
     overflow-x: auto;
