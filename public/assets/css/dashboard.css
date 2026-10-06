@@ -2157,3 +2157,152 @@ td:nth-child(7) {
         transition: none;
     }
 }
+
+
+/* Final trend layout refinement */
+.chart-card .trend-header {
+    padding-bottom: 15px;
+}
+
+.chart-card .trend-analysis {
+    background: #fff;
+}
+
+.chart-card .trend-metrics {
+    grid-template-columns: minmax(180px, .75fr) minmax(0, 1.25fr);
+    gap: 1px;
+}
+
+.chart-card .trend-metric {
+    min-height: 82px;
+    padding: 15px 18px;
+}
+
+.chart-card .trend-metric strong {
+    font-size: 17px;
+}
+
+.chart-card .trend-metric small {
+    white-space: normal;
+    line-height: 1.45;
+}
+
+.chart-card .chart-wrap {
+    min-height: 360px;
+    padding: 12px 18px 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.chart-card .counter-chart {
+    height: 350px;
+}
+
+.chart-card .trend-period-table-wrap {
+    padding: 14px 18px 18px;
+    border-top: 0;
+    overflow-x: auto;
+}
+
+.chart-card .trend-period-table {
+    width: 100%;
+    min-width: 650px;
+    table-layout: fixed;
+}
+
+.chart-card .trend-period-table th,
+.chart-card .trend-period-table td {
+    padding: 10px 12px;
+}
+
+.chart-card .trend-period-table th:nth-child(1),
+.chart-card .trend-period-table td:nth-child(1) {
+    width: 20%;
+    text-align: left;
+}
+
+.chart-card .trend-period-table th:nth-child(2),
+.chart-card .trend-period-table td:nth-child(2) {
+    width: 26%;
+    text-align: right;
+}
+
+.chart-card .trend-period-table th:nth-child(3),
+.chart-card .trend-period-table td:nth-child(3) {
+    width: 34%;
+    text-align: left;
+}
+
+.chart-card .trend-period-table th:nth-child(4),
+.chart-card .trend-period-table td:nth-child(4) {
+    width: 20%;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.chart-card .trend-period-table th {
+    white-space: nowrap;
+}
+
+.chart-card .trend-period-table td {
+    white-space: nowrap;
+}
+
+.chart-card .trend-period-table tbody tr:nth-child(even) {
+    background: #fbfcfd;
+}
+
+.chart-card .trend-period-table tbody tr:hover {
+    background: #f1f6f9;
+}
+
+.chart-card .trend-count {
+    min-width: 92px;
+    min-height: 26px;
+}
+
+@media (max-width: 700px) {
+    .chart-card .trend-header {
+        padding: 15px 16px;
+    }
+
+    .chart-card .trend-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card .trend-metric {
+        min-height: 0;
+        padding: 13px 15px;
+    }
+
+    .chart-card .trend-metric strong {
+        font-size: 15px;
+    }
+
+    .chart-card .chart-wrap {
+        min-height: 300px;
+        padding: 8px 8px 6px;
+    }
+
+    .chart-card .counter-chart {
+        height: 292px;
+    }
+
+    .chart-card .trend-period-table-wrap {
+        padding: 10px 10px 14px;
+    }
+
+    .chart-card .trend-period-table {
+        min-width: 620px;
+    }
+}
+
+@media (max-width: 420px) {
+    .chart-card .trend-period-table {
+        min-width: 590px;
+    }
+
+    .chart-card .trend-period-table th,
+    .chart-card .trend-period-table td {
+        padding: 9px 9px;
+    }
+}
