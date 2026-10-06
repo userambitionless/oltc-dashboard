@@ -777,10 +777,24 @@ function evidenceUrl(?string $path): ?string
 
                     <tbody>
 
+                    <?php
+                    $displayIdsByDate = [];
+                    foreach ($data as $row) {
+                        $dateKey = (string) $row['tanggal'];
+                        $displayIdsByDate[$dateKey] = ($displayIdsByDate[$dateKey] ?? 0) + 1;
+                    }
+                    $displayIdCounters = [];
+                    ?>
+
                     <?php foreach ($data as $row): ?>
+                        <?php
+                        $dateKey = (string) $row['tanggal'];
+                        $displayIdCounters[$dateKey] = ($displayIdCounters[$dateKey] ?? 0) + 1;
+                        $displayId = $displayIdCounters[$dateKey];
+                        ?>
 
                         <tr>
-                            <td><?= htmlspecialchars($row['id']) ?></td>
+                            <td><?= $displayId ?></td>
                             <td><?= htmlspecialchars($row['hari']) ?></td>
                             <td><?= htmlspecialchars(formatEnglishDate($row['tanggal'])) ?></td>
                             <td class="time"><?= htmlspecialchars($row['jam']) ?></td>
