@@ -1405,18 +1405,22 @@ td:nth-child(7) {
 
 .trend-period-table-wrap {
     overflow-x: auto;
+    padding: 0 18px 6px;
     border-top: 1px solid var(--border);
 }
 
 .trend-period-table {
-    width: 100%;
+    width: min(100%, 760px);
     min-width: 0;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0;
     table-layout: fixed;
 }
 
 .trend-period-table th,
 .trend-period-table td {
-    padding: 10px 15px;
+    padding: 11px 14px;
     font-size: 10px;
     vertical-align: middle;
 }
@@ -1424,17 +1428,31 @@ td:nth-child(7) {
 .trend-period-table th {
     position: static;
     background: #f7f8f9;
+    color: var(--muted-strong);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.trend-period-table th:first-child {
+    border-top-left-radius: 7px;
+}
+
+.trend-period-table th:last-child {
+    border-top-right-radius: 7px;
 }
 
 .trend-period-table th:nth-child(1),
 .trend-period-table td:nth-child(1) {
-    width: 60%;
+    width: 64%;
     text-align: left;
 }
 
 .trend-period-table th:nth-child(2),
 .trend-period-table td:nth-child(2) {
-    width: 40%;
+    width: 36%;
     text-align: right;
     white-space: nowrap;
 }
@@ -1443,10 +1461,32 @@ td:nth-child(7) {
     font-family: "IBM Plex Mono", monospace;
     font-size: 11px;
     font-variant-numeric: tabular-nums;
+    border-bottom: 1px solid #edf0f2;
+}
+
+.trend-period-table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
 .trend-period-table tbody tr:hover {
     background: #fafcfd;
+}
+
+.trend-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 76px;
+    min-height: 28px;
+    padding: 4px 10px;
+    border: 1px solid #cbdde8;
+    border-radius: 6px;
+    background: #f3f8fb;
+    color: var(--primary);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
 }
 
 @media (max-width: 1100px) {
