@@ -63,38 +63,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <main class="auth-page">
-    <section class="auth-card">
-        <div class="auth-header">
-            <div class="auth-logos">
-                <img class="auth-pln-logo" src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png" alt="Logo PLN">
-                <img class="auth-oltc-logo" src="favicon2.png" alt="Logo OLTC">
+    <section class="auth-shell">
+        <div class="auth-visual">
+            <div class="visual-top">
+                <div class="visual-logos">
+                    <img class="visual-pln" src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png" alt="Logo PLN">
+                    <span class="visual-divider"></span>
+                    <img class="visual-oltc" src="favicon2.png" alt="Logo OLTC">
+                </div>
+                <span class="visual-status"><i></i> SYSTEM ONLINE</span>
             </div>
-            <div class="auth-system-badge"><span></span> MONITORING SYSTEM</div>
-            <h1>OLTC Counter Dashboard</h1>
-            <p>Masuk untuk mengakses monitoring dan riwayat pembacaan counter OLTC.</p>
+
+            <div class="visual-content">
+                <p class="visual-kicker">MONITORING SYSTEM</p>
+                <h1>OLTC Counter<br><em>Dashboard</em></h1>
+                <p class="visual-description">
+                    Monitoring dan riwayat pembacaan counter OLTC berbasis data
+                    dalam satu dashboard terpusat.
+                </p>
+            </div>
+
+            <div class="visual-grid" aria-hidden="true"></div>
+            <div class="visual-orb visual-orb-one" aria-hidden="true"></div>
+            <div class="visual-orb visual-orb-two" aria-hidden="true"></div>
+
+            <div class="visual-footer">
+                <span>POWER SYSTEM MONITORING</span>
+                <span>WIB · <?= date('Y') ?></span>
+            </div>
         </div>
 
-        <?php if ($error !== ''): ?>
-            <div class="auth-alert" role="alert"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
+        <div class="auth-panel">
+            <div class="auth-panel-inner">
+                <div class="mobile-brand">
+                    <img src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png" alt="Logo PLN">
+                    <img src="favicon2.png" alt="Logo OLTC">
+                </div>
 
-        <form method="post" class="auth-form">
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) $_SESSION['login_csrf']) ?>">
+                <div class="auth-heading">
+                    <p class="eyebrow">SECURE ACCESS</p>
+                    <h2>Selamat datang.</h2>
+                    <p>Masukkan kredensial Anda untuk melanjutkan ke dashboard.</p>
+                </div>
 
-            <div class="auth-field">
-                <label for="username">Username</label>
-                <input id="username" name="username" type="text" autocomplete="username" autofocus required>
+                <?php if ($error !== ''): ?>
+                    <div class="auth-alert" role="alert"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+
+                <form method="post" class="auth-form">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) $_SESSION['login_csrf']) ?>">
+
+                    <div class="auth-field">
+                        <label for="username">Username</label>
+                        <div class="input-wrap">
+                            <span class="field-icon" aria-hidden="true">ID</span>
+                            <input id="username" name="username" type="text" autocomplete="username" autofocus required placeholder="Masukkan username">
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="password">Password</label>
+                        <div class="input-wrap">
+                            <span class="field-icon" aria-hidden="true">••</span>
+                            <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Masukkan password">
+                        </div>
+                    </div>
+
+                    <button class="auth-button" type="submit">
+                        <span>Masuk ke Dashboard</span>
+                        <span class="auth-button-arrow">→</span>
+                    </button>
+                </form>
+
+                <div class="auth-footer">Akses resmi · OLTC Counter Dashboard · <?= date('Y') ?></div>
             </div>
-
-            <div class="auth-field">
-                <label for="password">Password</label>
-                <input id="password" name="password" type="password" autocomplete="current-password" required>
-            </div>
-
-            <button class="auth-button" type="submit"><span>Masuk ke Dashboard</span><span class="auth-button-arrow">→</span></button>
-        </form>
-
-        <div class="auth-footer">OLTC Dashboard · <?= date('Y') ?></div>
+        </div>
     </section>
 </main>
 </body>
