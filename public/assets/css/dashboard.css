@@ -172,17 +172,32 @@ button, input { font: inherit; }
     display: block;
 }
 
+.brand-logos {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin: 0 0 13px;
+}
+
 .pln-logo {
     position: static;
     display: block;
     width: 180px;
-    height: auto;
-    max-height: 64px;
-    margin: 0 0 13px;
+    height: 64px;
     object-fit: contain;
     object-position: left center;
     border-radius: 0;
     background: transparent;
+}
+
+.oltc-logo {
+    width: 156px;
+    height: 64px;
+    flex: 0 0 156px;
+    background-image: url("../../favicon2.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 253px 253px;
 }
 
 .brand-copy {
@@ -894,10 +909,21 @@ td:nth-child(7) {
         width: 100%;
     }
 
+    .brand-logos {
+        gap: 16px;
+        margin-bottom: 11px;
+    }
+
     .pln-logo {
         width: 140px;
-        max-height: 50px;
-        margin-bottom: 11px;
+        height: 50px;
+    }
+
+    .oltc-logo {
+        width: 124px;
+        height: 50px;
+        flex-basis: 124px;
+        background-size: 198px 198px;
     }
 
     .brand-copy h1 {
@@ -1650,10 +1676,21 @@ td:nth-child(7) {
         width: 100%;
     }
 
+    .brand-logos {
+        gap: 14px;
+        margin-bottom: 10px;
+    }
+
     .pln-logo {
         width: min(140px, 42vw);
-        max-height: 50px;
-        margin-bottom: 10px;
+        height: 50px;
+    }
+
+    .oltc-logo {
+        width: min(124px, 38vw);
+        height: 50px;
+        flex-basis: min(124px, 38vw);
+        background-size: 198px 198px;
     }
 
     .brand-copy h1 {
@@ -1919,8 +1956,20 @@ td:nth-child(7) {
         padding-top: 84px;
     }
 
+    .brand-logos {
+        gap: 10px;
+    }
+
     .pln-logo {
         width: min(124px, 38vw);
+        height: 44px;
+    }
+
+    .oltc-logo {
+        width: min(108px, 33vw);
+        height: 44px;
+        flex-basis: min(108px, 33vw);
+        background-size: 172px 172px;
     }
 
     .brand-copy h1 {

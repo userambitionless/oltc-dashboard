@@ -438,11 +438,13 @@ function evidenceUrl(?string $path): ?string
     <header class="header">
         <div class="header-brand">
             <div class="brand-row">
-                <img
-                    class="pln-logo"
-                    src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png"
-                    alt="Logo PLN"
-                >
+                <div class="brand-logos">
+                    <img
+                        class="pln-logo"
+                        src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png"
+                        alt="Logo PLN"
+                    >
+                    <div class="oltc-logo" role="img" aria-label="Logo OLTC"></div>
                 <div class="brand-copy">
                     <p class="eyebrow">Monitoring System</p>
                     <h1>OLTC Counter Dashboard</h1>
