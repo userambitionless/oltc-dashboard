@@ -520,22 +520,6 @@ function evidenceUrl(?string $path): ?string
         </article>
 
         <article class="card stat-card">
-            <div class="stat-label">Perubahan Terakhir</div>
-            <?php if ($valueChange === null): ?>
-                <div class="stat-value">-</div>
-                <div class="stat-meta">Belum cukup data untuk dibandingkan</div>
-            <?php else: ?>
-                <?php $changeClass = $valueChange > 0 ? 'change-up' : ($valueChange < 0 ? 'change-down' : 'change-neutral'); ?>
-                <div class="stat-value <?= $changeClass ?>">
-                    <?= $valueChange > 0 ? '+' : '' ?><?= number_format($valueChange, 3, ',', '.') ?>
-                </div>
-                <div class="stat-meta">
-                    <?= $valueChange > 0 ? 'Naik dari pembacaan sebelumnya' : ($valueChange < 0 ? 'Turun dari pembacaan sebelumnya' : 'Tidak berubah') ?>
-                </div>
-            <?php endif; ?>
-        </article>
-
-        <article class="card stat-card">
             <div class="stat-label">Pembacaan Terakhir</div>
             <div class="stat-value">
                 <?= $latestDateTime ? htmlspecialchars($latestDateTime) : '-' ?>
