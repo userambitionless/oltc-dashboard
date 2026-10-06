@@ -423,8 +423,8 @@ function evidenceUrl(?string $path): ?string
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image/png" href="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png">
-    <link rel="shortcut icon" type="image/png" href="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png">
+    <link rel="icon" type="image/jpeg" href="favicon.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="favicon.jpg">
 
     <title>OLTC Dashboard</title>
 
