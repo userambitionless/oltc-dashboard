@@ -263,10 +263,10 @@ try {
         if (!isset($trendBuckets[$bucketKey])) {
             $trendBuckets[$bucketKey] = [
                 'label' => $trendPeriod === 'bulanan'
-                    ? $bucketStart->format('Y-m')
+                    ? $bucketStart->format('F Y')
                     : ($trendPeriod === 'mingguan'
-                        ? 'Minggu ' . $bucketStart->format('d/m/Y')
-                        : $bucketStart->format('d/m/Y')),
+                        ? 'Week of ' . $bucketStart->format('j F Y')
+                        : $bucketStart->format('j F Y')),
                 'count' => 0,
                 'sum' => 0.0,
                 'min' => (float) $row['nilai_data'],
