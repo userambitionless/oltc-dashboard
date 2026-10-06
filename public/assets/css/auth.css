@@ -61,8 +61,44 @@ body:after{
     display:grid;
     place-items:center;
     padding:28px;
-    position:relative;
     overflow:hidden;
+}
+.auth-page:before,
+.auth-page:after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    width:280px;
+    height:280px;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(24px);
+    opacity:.52;
+    will-change:transform;
+}
+.auth-page:before{
+    left:-80px;
+    top:8%;
+    background:radial-gradient(circle,rgba(20,92,140,.22) 0%,rgba(20,92,140,.11) 42%,transparent 72%);
+    animation:loginOrbOne 18s ease-in-out infinite alternate;
+}
+.auth-page:after{
+    right:-90px;
+    bottom:2%;
+    background:radial-gradient(circle,rgba(72,153,193,.20) 0%,rgba(72,153,193,.09) 44%,transparent 72%);
+    animation:loginOrbTwo 22s ease-in-out infinite alternate;
+}
+@keyframes loginOrbOne{
+    0%{transform:translate3d(0,0,0) scale(.82)}
+    35%{transform:translate3d(180px,90px,0) scale(1.05)}
+    70%{transform:translate3d(420px,-20px,0) scale(.9)}
+    100%{transform:translate3d(680px,150px,0) scale(1.12)}
+}
+@keyframes loginOrbTwo{
+    0%{transform:translate3d(0,0,0) scale(.9)}
+    35%{transform:translate3d(-180px,-110px,0) scale(1.08)}
+    70%{transform:translate3d(-420px,40px,0) scale(.82)}
+    100%{transform:translate3d(-680px,-150px,0) scale(1.12)}
 }
 .auth-shell{
     width:min(1080px,100%);
@@ -246,6 +282,8 @@ body:after{
     .auth-heading h2{font-size:30px}
 }
 @media(prefers-reduced-motion:reduce){
-    body:before{animation:none!important}
+    body:before,
+    .auth-page:before,
+    .auth-page:after{animation:none!important}
     *{scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
