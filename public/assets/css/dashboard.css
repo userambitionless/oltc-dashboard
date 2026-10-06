@@ -1428,18 +1428,13 @@ td:nth-child(7) {
 
 .trend-period-table th:nth-child(1),
 .trend-period-table td:nth-child(1) {
-    width: 24%;
+    width: 60%;
+    text-align: left;
 }
 
 .trend-period-table th:nth-child(2),
 .trend-period-table td:nth-child(2) {
-    width: 14%;
-    text-align: center;
-}
-
-.trend-period-table th:nth-child(3),
-.trend-period-table td:nth-child(3) {
-    width: 62%;
+    width: 40%;
     text-align: right;
     white-space: nowrap;
 }
