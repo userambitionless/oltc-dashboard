@@ -351,7 +351,7 @@ try {
 
     $recentTrendSummary = $recentTrendCount > 0
         ? implode(' → ', array_map(
-            static fn (float $value): string => (string) (int) $value,
+            static fn (float $value): string => formatCounterValue($value),
             $recentTrendValues
         ))
         : 'Belum cukup data';
@@ -398,6 +398,11 @@ $avgValue = $stats['avg_value'] ?? null;
 $latestDateTime = $latestRow
     ? ($latestRow['tanggal'] . ' ' . $latestRow['jam'])
     : null;
+
+function formatCounterValue(float|int|string $value): string
+{
+    return number_format((float) $value, 0, '', '');
+}
 
 function evidenceUrl(?string $path): ?string
 {
@@ -512,7 +517,7 @@ function evidenceUrl(?string $path): ?string
         <article class="card stat-card">
             <div class="stat-label">Nilai Terbaru</div>
             <div class="stat-value">
-                <?= htmlspecialchars((string) (int) $latestValue) ?>
+                <?= htmlspecialchars(formatCounterValue($latestValue)) ?>
             </div>
             <div class="stat-meta">
                 Hasil pembacaan terakhir
@@ -639,7 +644,7 @@ function evidenceUrl(?string $path): ?string
         <div><span>Hari</span><strong><?= htmlspecialchars((string) $detailRecord['hari']) ?></strong></div>
         <div><span>Tanggal</span><strong><?= htmlspecialchars((string) $detailRecord['tanggal']) ?></strong></div>
         <div><span>Jam</span><strong><?= htmlspecialchars((string) $detailRecord['jam']) ?></strong></div>
-        <div><span>Nilai Counter</span><strong><?= htmlspecialchars((int) $detailRecord['nilai_data']) ?></strong></div>
+        <div><span>Nilai Counter</span><strong><?= htmlspecialchars(formatCounterValue($detailRecord['nilai_data'])) ?></strong></div>
         <div><span>Sumber Data</span><strong><?= ($detailRecord['source'] ?? 'api') === 'manual' ? 'Manual' : 'API' ?></strong></div>
         <div><span>Dibuat</span><strong><?= htmlspecialchars((string) $detailRecord['created_at']) ?></strong></div>
         <div><span>Diperbarui</span><strong><?= htmlspecialchars((string) $detailRecord['updated_at']) ?></strong></div>
@@ -719,7 +724,7 @@ function evidenceUrl(?string $path): ?string
         <?php else: ?>
             <div class="trend-analysis">
                 <div class="trend-metrics">
-                    <div class="trend-metric"><span>Periode</span><strong><?= (string) $trendCount ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
+                    <div class="trend-metric"><span>Periode</span><strong><?= formatCounterValue($trendCount) ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
                     <div class="trend-metric">
                         <span>Arah Trend</span>
                         <strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong>
@@ -736,7 +741,7 @@ function evidenceUrl(?string $path): ?string
                         <?php foreach ($trendData as $period): ?>
                             <tr>
                                 <td><?= htmlspecialchars($period['label']) ?></td>
-                                <td><span class="trend-count"><?= (string) $period['count'] ?> data</span></td>
+                                <td><span class="trend-count"><?= formatCounterValue($period['count']) ?> data</span></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -809,7 +814,7 @@ function evidenceUrl(?string $path): ?string
                             <td><?= htmlspecialchars($row['tanggal']) ?></td>
                             <td class="time"><?= htmlspecialchars($row['jam']) ?></td>
                             <td class="value">
-                                <?= htmlspecialchars((string) (int) $row['nilai_data']) ?>
+                                <?= htmlspecialchars(formatCounterValue($row['nilai_data'])) ?>
                             </td>
                             <td>
                                 <?php $photoUrl = evidenceUrl($row['foto_path']); ?>
