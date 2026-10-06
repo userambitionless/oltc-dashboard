@@ -154,6 +154,7 @@ button, input { font: inherit; }
 }
 
 .header {
+    position: relative;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -165,22 +166,23 @@ button, input { font: inherit; }
 
 .header-brand {
     min-width: 0;
+    padding-left: 78px;
 }
 
 .brand-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    display: block;
 }
 
 .pln-logo {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: block;
-    width: 58px;
-    height: 58px;
-    flex: 0 0 58px;
+    width: 62px;
+    height: 62px;
     object-fit: contain;
-    border-radius: 8px;
-    background: #fff;
+    border-radius: 0;
+    background: transparent;
 }
 
 .brand-copy {
@@ -933,15 +935,14 @@ td:nth-child(7) {
 }
 
 @media (max-width: 700px) {
-    .brand-row {
-        align-items: flex-start;
-        gap: 12px;
+    .header-brand {
+        width: 100%;
+        padding-left: 62px;
     }
 
     .pln-logo {
         width: 48px;
         height: 48px;
-        flex-basis: 48px;
     }
 
     .brand-copy h1 {
