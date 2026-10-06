@@ -444,7 +444,12 @@ function evidenceUrl(?string $path): ?string
                         src="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png"
                         alt="Logo PLN"
                     >
-                    <div class="oltc-logo" role="img" aria-label="Logo OLTC"></div>
+                    <img
+                        class="oltc-logo"
+                        src="favicon2.png"
+                        alt="Logo OLTC"
+                    >
+                </div>
                 <div class="brand-copy">
                     <p class="eyebrow">Monitoring System</p>
                     <h1>OLTC Counter Dashboard</h1>
