@@ -676,7 +676,7 @@ function evidenceUrl(?string $path): ?string
                         <?php foreach ($trendData as $period): ?>
                             <tr>
                                 <td><?= htmlspecialchars($period['label']) ?></td>
-                                <td><?= number_format($period['count'], 0, ',', '.') ?> data</td>
+                                <td><span class="trend-count"><?= number_format($period['count'], 0, ',', '.') ?> data</span></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
