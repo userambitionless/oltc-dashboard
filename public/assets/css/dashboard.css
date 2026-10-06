@@ -366,7 +366,7 @@ h1 {
 
 .stats {
     display: grid;
-    grid-template-columns: 1.2fr 1.2fr 1fr 1.35fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1px;
     margin-bottom: 22px;
     border: 1px solid var(--border);
@@ -899,7 +899,7 @@ td:nth-child(7) {
 }
 
 @media (max-width: 1100px) {
-    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .filter-form { grid-template-columns: repeat(2, 1fr); }
     .filter-actions { grid-column: 1 / -1; }
 }
