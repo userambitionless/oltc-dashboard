@@ -16,6 +16,21 @@ $currentUser = currentUser();
 $successMessage = '';
 $errorMessage = '';
 
+function formatEnglishDateTime(?string $dateTime): string
+{
+    if (!$dateTime) {
+        return '-';
+    }
+
+    $dateObject = DateTime::createFromFormat('!Y-m-d H:i:s', $dateTime);
+
+    if (!$dateObject) {
+        return $dateTime;
+    }
+
+    return $dateObject->format('j F Y H:i:s');
+}
+
 function verifyUserCsrf(): void
 {
     $token = (string) ($_POST['csrf_token'] ?? '');
@@ -231,7 +246,7 @@ try {
                                 <?= strtoupper(htmlspecialchars($user['role'])) ?>
                             </span>
                         </td>
-                        <td class="time"><?= htmlspecialchars($user['created_at'] ?? '-') ?></td>
+                        <td class="time"><?= htmlspecialchars(formatEnglishDateTime($user['created_at'] ?? null)) ?></td>
                         <td class="table-action-cell">
                             <?php if ((int) $user['id'] === (int) ($currentUser['id'] ?? 0)): ?>
                                 <span class="user-current-label">Akun saat ini</span>
