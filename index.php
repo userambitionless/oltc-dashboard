@@ -190,10 +190,6 @@ $filterStart = $_GET['start_date'] ?? '';
 $filterEnd = $_GET['end_date'] ?? '';
 $filterMinValue = $_GET['min_value'] ?? '';
 $filterMaxValue = $_GET['max_value'] ?? '';
-$trendPeriod = (string) ($_GET['trend_period'] ?? 'harian');
-if (!in_array($trendPeriod, ['harian', 'mingguan', 'bulanan'], true)) {
-    $trendPeriod = 'harian';
-}
 $page = isset($_GET['page']) && ctype_digit((string) $_GET['page']) ? (int) $_GET['page'] : 1;
 $page = max(1, $page);
 $perPage = 20;
@@ -240,61 +236,31 @@ try {
     $page = min($page, $totalPages);
     $offset = ($page - 1) * $perPage;
 
+    // Trend menggunakan setiap pembacaan aktual sebagai satu titik.
+    // Urutan ditentukan oleh ID data masuk, bukan pengelompokan tanggal/periode.
     $chartStmt = $pdo->prepare("
         SELECT id, tanggal, jam, nilai_data
         FROM counter_readings
         $whereSql
-        ORDER BY tanggal DESC, jam DESC, id DESC
+        ORDER BY id ASC
         LIMIT 5000
     ");
     $chartStmt->execute($params);
-    $chartDataRows = array_reverse($chartStmt->fetchAll());
-
-    $trendBuckets = [];
-    foreach ($chartDataRows as $row) {
-        $date = new DateTimeImmutable((string) $row['tanggal']);
-        $bucketStart = match ($trendPeriod) {
-            'mingguan' => $date->modify('monday this week'),
-            'bulanan' => $date->modify('first day of this month'),
-            default => $date,
-        };
-        $bucketKey = $bucketStart->format('Y-m-d');
-
-        if (!isset($trendBuckets[$bucketKey])) {
-            $trendBuckets[$bucketKey] = [
-                'label' => $trendPeriod === 'bulanan'
-                    ? $bucketStart->format('F Y')
-                    : ($trendPeriod === 'mingguan'
-                        ? 'Week of ' . $bucketStart->format('j F Y')
-                        : $bucketStart->format('j F Y')),
-                'count' => 0,
-                'sum' => 0.0,
-                'min' => (float) $row['nilai_data'],
-                'max' => (float) $row['nilai_data'],
-
-            ];
-        }
-
-        $value = (float) $row['nilai_data'];
-        $trendBuckets[$bucketKey]['count']++;
-        $trendBuckets[$bucketKey]['sum'] += $value;
-        $trendBuckets[$bucketKey]['min'] = min($trendBuckets[$bucketKey]['min'], $value);
-        $trendBuckets[$bucketKey]['max'] = max($trendBuckets[$bucketKey]['max'], $value);
-    }
+    $chartDataRows = $chartStmt->fetchAll();
 
     $trendData = [];
-    foreach ($trendBuckets as $bucket) {
+    foreach ($chartDataRows as $index => $row) {
         $trendData[] = [
-            'label' => $bucket['label'],
-            'count' => $bucket['count'],
-            'average' => $bucket['sum'] / $bucket['count'],
-            'min' => $bucket['min'],
-            'max' => $bucket['max'],
-
+            'id' => (int) $row['id'],
+            'label' => 'Pembacaan #' . ($index + 1),
+            'tanggal' => (string) $row['tanggal'],
+            'jam' => (string) $row['jam'],
+            'value' => (float) $row['nilai_data'],
         ];
     }
 
     $trendCount = count($trendData);
+
     // Arah trend menggunakan maksimal 3 pembacaan aktual paling terakhir.
     $recentTrendRows = array_slice($chartDataRows, -3);
     $recentTrendValues = array_map(
@@ -302,8 +268,6 @@ try {
         $recentTrendRows
     );
     $recentTrendCount = count($recentTrendValues);
-    $recentTrendFirst = $recentTrendCount > 0 ? $recentTrendValues[0] : null;
-    $recentTrendLast = $recentTrendCount > 0 ? $recentTrendValues[$recentTrendCount - 1] : null;
 
     if ($recentTrendCount < 2) {
         $trendDirection = 'Belum cukup data';
@@ -721,16 +685,7 @@ function evidenceUrl(?string $path): ?string
         <div class="data-header trend-header">
             <div>
                 <h2 class="data-title">Trend Pembacaan Counter</h2>
-                <p class="data-description">Analisis perubahan nilai berdasarkan agregasi periode dan filter data yang sedang aktif.</p>
-            </div>
-            <div class="trend-controls">
-                <span>PERIODE</span>
-                <div class="trend-periods">
-                    <?php foreach (['harian' => 'Harian', 'mingguan' => 'Mingguan', 'bulanan' => 'Bulanan'] as $periodKey => $periodLabel): ?>
-                        <?php $periodQuery = $_GET; $periodQuery['trend_period'] = $periodKey; $periodQuery['page'] = 1; ?>
-                        <a class="<?= $trendPeriod === $periodKey ? 'is-active' : '' ?>" href="index.php?<?= htmlspecialchars(http_build_query($periodQuery)) ?>"><?= htmlspecialchars($periodLabel) ?></a>
-                    <?php endforeach; ?>
-                </div>
+                <p class="data-description">Setiap nilai counter yang masuk ditampilkan sebagai satu titik pembacaan.</p>
             </div>
         </div>
 
@@ -739,11 +694,11 @@ function evidenceUrl(?string $path): ?string
         <?php else: ?>
             <div class="trend-analysis">
                 <div class="trend-metrics">
-                    <div class="trend-metric"><span>Periode</span><strong><?= formatCounterValue($trendCount) ?></strong><small><?= htmlspecialchars(ucfirst($trendPeriod)) ?></small></div>
+                    <div class="trend-metric"><span>Total Pembacaan</span><strong><?= formatCounterValue($trendCount) ?></strong><small>Setiap data = 1 titik</small></div>
                     <div class="trend-metric">
                         <span>Arah Trend</span>
                         <strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong>
-                        <small>Nilai: <?= htmlspecialchars($recentTrendSummary) ?></small>
+                        <small>3 pembacaan terakhir: <?= htmlspecialchars($recentTrendSummary) ?></small>
                     </div>
                 </div>
                 <div class="chart-wrap">
@@ -751,12 +706,14 @@ function evidenceUrl(?string $path): ?string
                 </div>
                 <div class="trend-period-table-wrap">
                     <table class="trend-period-table">
-                        <thead><tr><th>Periode</th><th>Jumlah Data</th></tr></thead>
+                        <thead><tr><th>Pembacaan</th><th>Nilai Counter</th><th>Tanggal</th><th>Jam</th></tr></thead>
                         <tbody>
-                        <?php foreach ($trendData as $period): ?>
+                        <?php foreach ($trendData as $reading): ?>
                             <tr>
-                                <td><?= htmlspecialchars($period['label']) ?></td>
-                                <td><span class="trend-count"><?= formatCounterValue($period['count']) ?> data</span></td>
+                                <td><?= htmlspecialchars($reading['label']) ?></td>
+                                <td><span class="trend-count"><?= htmlspecialchars(formatCounterValue($reading['value'])) ?></span></td>
+                                <td><?= htmlspecialchars(formatEnglishDate($reading['tanggal'])) ?></td>
+                                <td><?= htmlspecialchars($reading['jam']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -947,15 +904,7 @@ function evidenceUrl(?string $path): ?string
 </div>
 
 <script>
-    const chartData = <?= json_encode(array_map(static function ($row) {
-        return [
-            'label' => $row['label'],
-            'value' => (float) $row['average'],
-            'count' => (int) $row['count'],
-            'min' => (float) $row['min'],
-            'max' => (float) $row['max'],
-        ];
-    }, $trendData), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+    const chartData = <?= json_encode($trendData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
     function renderCounterChart() {
         const svg = document.getElementById('counterChart');
@@ -991,20 +940,7 @@ function evidenceUrl(?string $path): ?string
 
         const formatValue = (value) => String(Math.round(Number(value)));
 
-        const formatLabel = (label) => {
-            if (!label) return '';
-
-            if (label.startsWith('Week of ')) {
-                return label.replace('Week of ', '');
-            }
-
-            const monthYearMatch = label.match(/^([A-Za-z]+) (\\d{4})$/);
-            if (monthYearMatch) {
-                return monthYearMatch[1].slice(0, 3) + ' ' + monthYearMatch[2];
-            }
-
-            return label;
-        };
+        const formatLabel = (label) => label || '';
 
         const gridCount = 5;
         let markup = '<title id="counterChartTitle">Trend pembacaan counter OLTC</title><desc id="counterChartDescription">Grafik menunjukkan perubahan nilai counter berdasarkan pembacaan terbaru sesuai filter yang dipilih.</desc>';
@@ -1013,7 +949,7 @@ function evidenceUrl(?string $path): ?string
             const firstValue = chartData[0].value;
             const lastValue = chartData[chartData.length - 1].value;
             const trend = lastValue > firstValue ? 'meningkat' : (lastValue < firstValue ? 'menurun' : 'tidak berubah');
-            markup += '<text x="' + padding.left + '" y="15" class="chart-trend-note">Trend periode: ' + trend + '</text>';
+            markup += '<text x="' + padding.left + '" y="15" class="chart-trend-note">Trend pembacaan: ' + trend + '</text>';
         }
 
         for (let i = 0; i <= gridCount; i++) {
@@ -1035,7 +971,8 @@ function evidenceUrl(?string $path): ?string
             const cy = y(item.value);
 
             const pointClass = index === chartData.length - 1 ? 'chart-point chart-point-latest' : 'chart-point';
-            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" tabindex="0" aria-label="' + item.label + ', nilai ' + formatValue(item.value) + '"><title>' + item.label + ' — ' + formatValue(item.value) + '</title></circle>';
+            const pointDate = item.tanggal ? ' · ' + item.tanggal + ' ' + item.jam : '';
+            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" tabindex="0" aria-label="' + item.label + ', nilai ' + formatValue(item.value) + pointDate + '"><title>' + item.label + ' — ' + formatValue(item.value) + (pointDate ? ' — ' + item.tanggal + ' ' + item.jam : '') + '</title></circle>';
 
             const showLabel = chartData.length <= 12 || index === 0 || index === chartData.length - 1 || index % Math.ceil(chartData.length / 8) === 0;
 
