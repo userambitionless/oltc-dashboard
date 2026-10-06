@@ -163,6 +163,30 @@ button, input { font: inherit; }
     margin-bottom: 22px;
 }
 
+.header-brand {
+    min-width: 0;
+}
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.pln-logo {
+    display: block;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.brand-copy {
+    min-width: 0;
+}
+
 .eyebrow {
     margin: 0 0 7px;
     color: var(--primary);
@@ -909,6 +933,25 @@ td:nth-child(7) {
 }
 
 @media (max-width: 700px) {
+    .brand-row {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .pln-logo {
+        width: 48px;
+        height: 48px;
+        flex-basis: 48px;
+    }
+
+    .brand-copy h1 {
+        font-size: clamp(24px, 8vw, 32px);
+    }
+
+    .brand-copy .subtitle {
+        font-size: 12px;
+    }
+
     .header-realtime {
         top: 10px;
         width: 212px;
