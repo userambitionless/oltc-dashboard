@@ -260,6 +260,15 @@ try {
 
     $trendCount = count($trendData);
 
+    // Nomor tampilan riwayat di-reset untuk setiap tanggal dan mengikuti urutan jam masuk.
+    $displayIdByRecord = [];
+    $displayCountersByDate = [];
+    foreach ($chartDataRows as $chartRow) {
+        $dateKey = (string) $chartRow['tanggal'];
+        $displayCountersByDate[$dateKey] = ($displayCountersByDate[$dateKey] ?? 0) + 1;
+        $displayIdByRecord[(int) $chartRow['id']] = $displayCountersByDate[$dateKey];
+    }
+
     // Arah trend menggunakan maksimal 3 pembacaan aktual paling terakhir.
     $recentTrendRows = array_slice($chartDataRows, -3);
     $recentTrendValues = array_map(
@@ -777,21 +786,8 @@ function evidenceUrl(?string $path): ?string
 
                     <tbody>
 
-                    <?php
-                    $displayIdsByDate = [];
-                    foreach ($data as $row) {
-                        $dateKey = (string) $row['tanggal'];
-                        $displayIdsByDate[$dateKey] = ($displayIdsByDate[$dateKey] ?? 0) + 1;
-                    }
-                    $displayIdCounters = [];
-                    ?>
-
                     <?php foreach ($data as $row): ?>
-                        <?php
-                        $dateKey = (string) $row['tanggal'];
-                        $displayIdCounters[$dateKey] = ($displayIdCounters[$dateKey] ?? 0) + 1;
-                        $displayId = $displayIdCounters[$dateKey];
-                        ?>
+                        <?php $displayId = $displayIdByRecord[(int) $row['id']] ?? 0; ?>
 
                         <tr>
                             <td><?= $displayId ?></td>
