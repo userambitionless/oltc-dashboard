@@ -400,6 +400,20 @@ h1 {
     line-height: 1.05;
 }
 
+.stat-datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.stat-datetime .stat-time {
+    color: var(--accent);
+    font-size: .72em;
+    font-weight: 650;
+    letter-spacing: -.01em;
+}
+
 .stat-meta {
     margin-top: 8px;
     color: var(--muted);
