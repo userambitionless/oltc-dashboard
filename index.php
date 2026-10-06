@@ -391,6 +391,21 @@ function formatEnglishDate(?string $date): string
     return $dateObject->format('j F Y');
 }
 
+function formatEnglishDateTime(?string $dateTime): string
+{
+    if (!$dateTime) {
+        return '-';
+    }
+
+    $dateObject = DateTime::createFromFormat('!Y-m-d H:i:s', $dateTime);
+
+    if (!$dateObject) {
+        return $dateTime;
+    }
+
+    return $dateObject->format('j F Y H:i:s');
+}
+
 function evidenceUrl(?string $path): ?string
 {
     if (!$path) {
@@ -634,12 +649,12 @@ function evidenceUrl(?string $path): ?string
     </div>
     <div class="detail-grid">
         <div><span>Hari</span><strong><?= htmlspecialchars((string) $detailRecord['hari']) ?></strong></div>
-        <div><span>Tanggal</span><strong><?= htmlspecialchars((string) $detailRecord['tanggal']) ?></strong></div>
+        <div><span>Tanggal</span><strong><?= htmlspecialchars(formatEnglishDate((string) $detailRecord['tanggal'])) ?></strong></div>
         <div><span>Jam</span><strong><?= htmlspecialchars((string) $detailRecord['jam']) ?></strong></div>
         <div><span>Nilai Counter</span><strong><?= htmlspecialchars(formatCounterValue($detailRecord['nilai_data'])) ?></strong></div>
         <div><span>Sumber Data</span><strong><?= ($detailRecord['source'] ?? 'api') === 'manual' ? 'Manual' : 'API' ?></strong></div>
-        <div><span>Dibuat</span><strong><?= htmlspecialchars((string) $detailRecord['created_at']) ?></strong></div>
-        <div><span>Diperbarui</span><strong><?= htmlspecialchars((string) $detailRecord['updated_at']) ?></strong></div>
+        <div><span>Dibuat</span><strong><?= htmlspecialchars(formatEnglishDateTime($detailRecord['created_at'] ?? null)) ?></strong></div>
+        <div><span>Diperbarui</span><strong><?= htmlspecialchars(formatEnglishDateTime($detailRecord['updated_at'] ?? null)) ?></strong></div>
     </div>
     <?php if (!empty($detailRecord['foto_path'])): ?>
         <div class="detail-evidence">
