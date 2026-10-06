@@ -200,6 +200,10 @@ h1 {
 }
 
 .header-realtime {
+    position: fixed;
+    top: 16px;
+    right: max(16px, calc((100vw - 1480px) / 2));
+    z-index: 1000;
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
@@ -208,7 +212,9 @@ h1 {
     padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 7px;
-    background: #fbfcfc;
+    background: rgba(251, 252, 252, .96);
+    box-shadow: 0 5px 18px rgba(24, 38, 48, .10);
+    backdrop-filter: blur(8px);
 }
 
 .realtime-dot {
@@ -846,6 +852,14 @@ td:nth-child(7) {
 }
 
 @media (max-width: 700px) {
+    .header-realtime {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+        justify-content: center;
+    }
+
+
     .page { width: min(100% - 28px, 1480px); padding-top: 20px; }
     .header { align-items: flex-start; flex-direction: column; }
     .header-status { align-items: flex-start; }
