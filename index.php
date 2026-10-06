@@ -423,8 +423,8 @@ function evidenceUrl(?string $path): ?string
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image/jpeg" href="favicon.jpg">
-    <link rel="shortcut icon" type="image/jpeg" href="favicon.jpg">
+    <link rel="icon" type="image/png" href="favicon2.png">
+    <link rel="shortcut icon" type="image/png" href="favicon2.png">
 
     <title>OLTC Dashboard</title>
 
