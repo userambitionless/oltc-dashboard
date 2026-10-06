@@ -90,14 +90,14 @@ if (
     ]);
 }
 
-if (!is_numeric($nilaiDataInput) || !is_finite((float) $nilaiDataInput)) {
+if (!preg_match('/^\d+$/', $nilaiDataInput)) {
     jsonResponse(422, [
         'success' => false,
         'message' => 'nilai_data harus berupa angka yang valid.',
     ]);
 }
 
-$nilaiData = (float) $nilaiDataInput;
+$nilaiData = (int) $nilaiDataInput;
 
 if (abs($nilaiData) > 999999999.999) {
     jsonResponse(422, [
@@ -211,7 +211,7 @@ try {
             'tanggal' => $savedData['tanggal'],
             'hari' => $savedData['hari'],
             'jam' => $savedData['jam'],
-            'nilai_data' => (float) $savedData['nilai_data'],
+            'nilai_data' => (int) $savedData['nilai_data'],
             'foto_path' => $savedData['foto_path'],
         ],
     ]);
