@@ -969,11 +969,18 @@ function evidenceUrl(?string $path): ?string
         const formatValue = (value) => String(Math.round(Number(value)));
 
         const formatLabel = (label) => {
-            const parts = label.split(' ');
-            if (parts.length < 2) return label;
-            const date = parts[0].split('-');
-            const time = parts[1].slice(0, 5);
-            return date.length === 3 ? date[2] + '/' + date[1] + ' ' + time : time;
+            if (!label) return '';
+
+            if (label.startsWith('Week of ')) {
+                return label.replace('Week of ', '');
+            }
+
+            const monthYearMatch = label.match(/^([A-Za-z]+) (\\d{4})$/);
+            if (monthYearMatch) {
+                return monthYearMatch[1].slice(0, 3) + ' ' + monthYearMatch[2];
+            }
+
+            return label;
         };
 
         const gridCount = 5;
