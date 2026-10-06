@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="auth-heading">
                     <p class="eyebrow">SECURE ACCESS</p>
                     <h2>Selamat datang.</h2>
-                    <p>Masukkan kredensial Anda untuk melanjutkan ke dashboard.</p>
+                    <p>Masukkan ID serta Password Anda untuk melanjutkan ke dashboard.</p>
                 </div>
 
                 <?php if ($error !== ''): ?>
