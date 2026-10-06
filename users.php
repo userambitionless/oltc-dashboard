@@ -130,7 +130,7 @@ try {
     <link rel="icon" type="image/png" href="favicon2.png">
     <link rel="shortcut icon" type="image/png" href="favicon2.png">
     <title>Manajemen User - OLTC Dashboard</title>
-    <link rel="stylesheet" href="public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="public/assets/css/dashboard.css?v=<?= rawurlencode((string) (filemtime(__DIR__ . '/public/assets/css/dashboard.css') ?: '1')) ?>">
 </head>
 <body>
 <div class="page">
