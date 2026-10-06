@@ -426,7 +426,7 @@ function evidenceUrl(?string $path): ?string
     <link rel="icon" type="image/png" href="favicon2.png">
     <link rel="shortcut icon" type="image/png" href="favicon2.png">
 
-    <title>OLTC Dashboard</title>
+    <title>OLTC Monitoring Dashboard</title>
 
     <link rel="stylesheet" href="public/assets/css/dashboard.css">
 </head>
