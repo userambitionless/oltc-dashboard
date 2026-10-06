@@ -671,13 +671,12 @@ function evidenceUrl(?string $path): ?string
                 </div>
                 <div class="trend-period-table-wrap">
                     <table class="trend-period-table">
-                        <thead><tr><th>Periode</th><th>Data</th><th>Awal → Akhir</th></tr></thead>
+                        <thead><tr><th>Periode</th><th>Jumlah Data</th></tr></thead>
                         <tbody>
                         <?php foreach ($trendData as $period): ?>
                             <tr>
                                 <td><?= htmlspecialchars($period['label']) ?></td>
-                                <td><?= number_format($period['count'], 0, ',', '.') ?></td>
-                                <td><?= number_format($period['first'], 3, ',', '.') ?> → <?= number_format($period['last'], 3, ',', '.') ?></td>
+                                <td><?= number_format($period['count'], 0, ',', '.') ?> data</td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
