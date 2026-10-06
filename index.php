@@ -433,12 +433,21 @@ function evidenceUrl(?string $path): ?string
 <div class="page">
 
     <header class="header">
-        <div>
-            <p class="eyebrow">Monitoring System</p>
-            <h1>OLTC Counter Dashboard</h1>
-            <p class="subtitle">
-                Monitoring dan riwayat pembacaan counter OLTC berbasis data.
-            </p>
+        <div class="header-brand">
+            <div class="brand-row">
+                <img
+                    class="pln-logo"
+                    src="https://zonalogo.com/assets/logo-pln.webp?asset=885&w=240"
+                    alt="Logo PLN"
+                >
+                <div class="brand-copy">
+                    <p class="eyebrow">Monitoring System</p>
+                    <h1>OLTC Counter Dashboard</h1>
+                    <p class="subtitle">
+                        Monitoring dan riwayat pembacaan counter OLTC berbasis data.
+                    </p>
+                </div>
+            </div>
         </div>
 
         <div class="header-status">
