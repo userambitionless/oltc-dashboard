@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image/png" href="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png">
-    <link rel="shortcut icon" type="image/png" href="PLN%20Logo%20-%20Colored%20-%205716x2048%20-%20zonalogo.com.png">
+    <link rel="icon" type="image/jpeg" href="favicon.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="favicon.jpg">
     <title>Login · OLTC Dashboard</title>
     <link rel="stylesheet" href="public/assets/css/auth.css">
 </head>
