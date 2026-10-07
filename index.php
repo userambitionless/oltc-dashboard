@@ -413,11 +413,61 @@ function evidenceUrl(?string $path): ?string
 <body>
 
 
-<div class="home-metal-button" aria-hidden="true">
+<button type="button" class="home-metal-button" id="aboutInfoButton" aria-label="About and Information" aria-controls="aboutInfoModal" aria-expanded="false">
     <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3.5 10.7 12 3.8l8.5 6.9v8.1a1.7 1.7 0 0 1-1.7 1.7H5.2a1.7 1.7 0 0 1-1.7-1.7v-8.1Z"></path>
-        <path d="M9.1 20.5v-5.2h5.8v5.2"></path>
+        <circle cx="12" cy="12" r="8.7"></circle>
+        <path d="M12 10.7v5.4"></path>
+        <path d="M12 7.7h.01"></path>
     </svg>
+</button>
+
+<div class="about-info-modal" id="aboutInfoModal" aria-hidden="true">
+    <div class="about-info-backdrop" data-about-close></div>
+    <section class="about-info-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutInfoTitle">
+        <button type="button" class="about-info-close" data-about-close aria-label="Tutup">×</button>
+        <div class="about-info-kicker">About and Information</div>
+        <h2 id="aboutInfoTitle">OLTC Counter Monitoring System</h2>
+        <p class="about-info-lead">
+            Sistem monitoring untuk mencatat, memantau, dan menampilkan riwayat pembacaan counter OLTC secara terstruktur.
+        </p>
+
+        <div class="about-info-grid">
+            <div class="about-info-item">
+                <span>Project</span>
+                <strong>OLTC Counter Dashboard</strong>
+            </div>
+            <div class="about-info-item">
+                <span>Fungsi utama</span>
+                <strong>Monitoring &amp; riwayat pembacaan</strong>
+            </div>
+            <div class="about-info-item">
+                <span>Sumber data</span>
+                <strong>Data pembacaan counter OLTC</strong>
+            </div>
+            <div class="about-info-item">
+                <span>Platform</span>
+                <strong>Web-based Monitoring System</strong>
+            </div>
+        </div>
+
+        <div class="about-info-section">
+            <h3>Tentang sistem</h3>
+            <p>
+                Dashboard ini dirancang sebagai bagian dari sistem monitoring counter OLTC.
+                Pada tahap pengembangan berikutnya, nilai digital hasil pembacaan perangkat
+                akan diterima oleh server dan ditampilkan pada dashboard sebagai data utama.
+            </p>
+        </div>
+
+        <div class="about-info-section">
+            <h3>Catatan pengembangan</h3>
+            <p>
+                Perangkat pembaca berbasis kamera dan Computer Vision/ML masih merupakan
+                bagian dari rencana pengembangan proyek. Foto pembuktian pembacaan digunakan
+                sebagai evidence, sedangkan nilai digital menjadi data utama sistem.
+            </p>
+        </div>
+    </section>
 </div>
 
 <div class="page">
@@ -1074,5 +1124,35 @@ function evidenceUrl(?string $path): ?string
     }
 </script>
 
+<script>
+(() => {
+    const button = document.getElementById('aboutInfoButton');
+    const modal = document.getElementById('aboutInfoModal');
+    if (!button || !modal) return;
+
+    const closeModal = () => {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        button.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('about-info-open');
+    };
+
+    const openModal = () => {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        button.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('about-info-open');
+        modal.querySelector('.about-info-close')?.focus();
+    };
+
+    button.addEventListener('click', openModal);
+    modal.querySelectorAll('[data-about-close]').forEach((element) => {
+        element.addEventListener('click', closeModal);
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    });
+})();
+</script>
 </body>
 </html>
