@@ -682,7 +682,7 @@ function evidenceUrl(?string $path): ?string
         <div><span>Tanggal</span><strong><?= htmlspecialchars(formatEnglishDate((string) $detailRecord['tanggal'])) ?></strong></div>
         <div><span>Jam</span><strong><?= htmlspecialchars((string) $detailRecord['jam']) ?></strong></div>
         <div><span>Nilai Counter</span><strong><?= htmlspecialchars(formatCounterValue($detailRecord['nilai_data'])) ?></strong></div>
-        <div><span>Sumber Data</span><strong><?= ($detailRecord['source'] ?? 'api') === 'manual' ? 'Manual' : 'API' ?></strong></div>
+        <div><span>Sumber Data</span><strong><?= ($detailRecord['source'] ?? 'api') === 'manual' ? 'Manual' : 'Main System' ?></strong></div>
         <div><span>Dibuat</span><strong><?= htmlspecialchars(formatEnglishDateTime($detailRecord['created_at'] ?? null)) ?></strong></div>
         <div><span>Diperbarui</span><strong><?= htmlspecialchars(formatEnglishDateTime($detailRecord['updated_at'] ?? null)) ?></strong></div>
     </div>
@@ -876,7 +876,7 @@ function evidenceUrl(?string $path): ?string
                             </td>
                             <td class="source-cell">
                                 <span class="source-badge source-<?= ($row['source'] ?? 'api') === 'manual' ? 'manual' : 'api' ?>">
-                                    <?= ($row['source'] ?? 'api') === 'manual' ? 'Manual' : 'API' ?>
+                                    <?= ($row['source'] ?? 'api') === 'manual' ? 'Manual' : 'Main System' ?>
                                 </span>
                             </td>
                             <td class="table-action-cell">
