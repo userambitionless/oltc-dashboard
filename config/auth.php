@@ -2,11 +2,60 @@
 
 declare(strict_types=1);
 
+/**
+ * Mulai sesi aplikasi dengan pengaturan cookie yang lebih aman.
+ *
+ * Secure aktif pada HTTPS langsung atau ketika request HTTPS diteruskan
+ * melalui reverse proxy yang dipercaya (misalnya Cloudflare Tunnel).
+ */
 function startAppSession(): void
 {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        return;
     }
+
+    // Cegah PHP menerima ID sesi yang belum pernah dibuat.
+    ini_set('session.use_strict_mode', '1');
+
+    // Cookie sesi tidak dapat dibaca melalui JavaScript.
+    ini_set('session.cookie_httponly', '1');
+
+    // Cookie tetap dikirim pada navigasi normal, tetapi dibatasi untuk
+    // mengurangi pengiriman lintas situs.
+    ini_set('session.cookie_samesite', 'Lax');
+
+    // Deteksi HTTPS langsung atau protokol HTTPS yang diteruskan proxy.
+    // HTTP_X_FORWARDED_PROTO hanya boleh dipercaya jika origin memang
+    // berada di belakang proxy tepercaya seperti Cloudflare Tunnel.
+    $httpsDirect = isset($_SERVER['HTTPS'])
+        && $_SERVER['HTTPS'] !== ''
+        && strtolower((string) $_SERVER['HTTPS']) !== 'off';
+
+    $forwardedProto = strtolower(trim(
+        explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))[0]
+    ));
+
+    $cloudflareVisitor = json_decode(
+        (string) ($_SERVER['HTTP_CF_VISITOR'] ?? ''),
+        true
+    );
+
+    $httpsViaProxy = $forwardedProto === 'https'
+        || (is_array($cloudflareVisitor)
+            && strtolower((string) ($cloudflareVisitor['scheme'] ?? '')) === 'https');
+
+    $cookieParams = session_get_cookie_params();
+
+    session_set_cookie_params([
+        'lifetime' => (int) $cookieParams['lifetime'],
+        'path' => $cookieParams['path'] !== '' ? $cookieParams['path'] : '/',
+        'domain' => $cookieParams['domain'],
+        'secure' => $httpsDirect || $httpsViaProxy,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+
+    session_start();
 }
 
 function appBasePath(): string
@@ -75,14 +124,18 @@ function logoutUser(): void
 
     if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
+
         setcookie(
             session_name(),
             '',
-            time() - 42000,
-            $params['path'],
-            $params['domain'],
-            $params['secure'],
-            $params['httponly']
+            [
+                'expires' => time() - 42000,
+                'path' => $params['path'] !== '' ? $params['path'] : '/',
+                'domain' => $params['domain'],
+                'secure' => $params['secure'],
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]
         );
     }
 
