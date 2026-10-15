@@ -2481,3 +2481,47 @@ textarea:focus-visible {
         flex: 1 1 auto;
     }
 }
+
+/* Small layout polish: preserve the existing visual style while tightening spacing consistency. */
+.page {
+    padding-top: 30px;
+    padding-bottom: 26px;
+}
+
+.header {
+    gap: 24px;
+    padding-bottom: 22px;
+    margin-bottom: 20px;
+}
+
+.filter-card,
+.chart-card {
+    margin-bottom: 16px;
+}
+
+.filter-header,
+.data-header {
+    padding: 16px 20px;
+}
+
+.filter-form {
+    gap: 11px;
+    padding: 16px 20px;
+}
+
+@media (max-width: 700px) {
+    .page {
+        padding-bottom: 18px;
+    }
+
+    .filter-header,
+    .data-header {
+        padding: 14px 16px;
+    }
+
+    .filter-form {
+        gap: 10px;
+        padding: 14px 16px;
+    }
+}
+
