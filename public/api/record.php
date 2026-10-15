@@ -51,9 +51,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ]);
 }
 
-$tanggal = trim((string) ($_POST['tanggal'] ?? ''));
-$jam = trim((string) ($_POST['jam'] ?? ''));
-$nilaiDataInput = trim((string) ($_POST['nilai_data'] ?? ''));
+// Terima payload JSON untuk pengirim baru, sambil tetap mendukung form-data
+// agar skrip dummy lama dan unggahan foto tetap kompatibel.
+$contentType = strtolower(trim(explode(';', (string) ($_SERVER['CONTENT_TYPE'] ?? ''))[0]));
+$inputData = $_POST;
+
+if ($contentType === 'application/json') {
+    $rawBody = file_get_contents('php://input');
+    $jsonData = json_decode($rawBody === false ? '' : $rawBody, true);
+
+    if (!is_array($jsonData) || json_last_error() !== JSON_ERROR_NONE) {
+        jsonResponse(400, [
+            'success' => false,
+            'message' => 'Body JSON tidak valid.',
+        ]);
+    }
+
+    $inputData = $jsonData;
+}
+
+$tanggal = trim((string) ($inputData['tanggal'] ?? ''));
+$jam = trim((string) ($inputData['jam'] ?? ''));
+$nilaiDataInput = trim((string) ($inputData['nilai_data'] ?? ''));
 
 if ($tanggal === '' || $jam === '' || $nilaiDataInput === '') {
     jsonResponse(422, [
