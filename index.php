@@ -443,6 +443,38 @@ try {
     $dataStmt->execute($params);
     $data = $dataStmt->fetchAll();
 
+    // Tandai data yang pernah dikoreksi tanpa mengubah source asli (misalnya api/Main System).
+    // Query terpisah agar dashboard tetap bisa dibuka jika tabel audit belum dibuat.
+    $correctedRecordIds = [];
+    if (!empty($data)) {
+        try {
+            $recordIds = array_values(array_unique(array_map(
+                static fn (array $row): int => (int) $row['id'],
+                $data
+            )));
+            $placeholders = [];
+            $correctionParams = [];
+            foreach ($recordIds as $index => $recordId) {
+                $placeholder = ':record_id_' . $index;
+                $placeholders[] = $placeholder;
+                $correctionParams[$placeholder] = $recordId;
+            }
+
+            $correctedStmt = $pdo->prepare(
+                'SELECT DISTINCT counter_reading_id
+                 FROM counter_reading_corrections
+                 WHERE counter_reading_id IN (' . implode(', ', $placeholders) . ')'
+            );
+            $correctedStmt->execute($correctionParams);
+            foreach ($correctedStmt->fetchAll(PDO::FETCH_COLUMN) as $correctedId) {
+                $correctedRecordIds[(int) $correctedId] = true;
+            }
+        } catch (PDOException $e) {
+            // Tanpa tabel audit, data tetap tampil dengan label sumber aslinya.
+            error_log('OLTC dashboard corrected source labels error: ' . $e->getMessage());
+        }
+    }
+
     // Karena chartDataRows sudah diurutkan dari waktu terlama ke terbaru,
     // baris terakhir adalah pembacaan dengan tanggal/jam paling baru dalam filter.
     $latestRow = $chartDataRows[count($chartDataRows) - 1] ?? null;
@@ -1027,8 +1059,17 @@ function evidenceUrl(?string $path): ?string
                                 <?php endif; ?>
                             </td>
                             <td class="source-cell">
-                                <span class="source-badge source-<?= ($row['source'] ?? 'api') === 'manual' ? 'manual' : 'api' ?>">
-                                    <?= ($row['source'] ?? 'api') === 'manual' ? 'Manual' : 'Main System' ?>
+                                <?php
+                                    $isManualSource = ($row['source'] ?? 'api') === 'manual';
+                                    $sourceLabel = $isManualSource ? 'Manual' : 'Main System';
+                                    $isCorrected = isset($correctedRecordIds[(int) $row['id']]);
+                                    if ($isCorrected) {
+                                        $sourceLabel .= ' (E)';
+                                    }
+                                ?>
+                                <span class="source-badge source-<?= $isManualSource ? 'manual' : 'api' ?><?= $isCorrected ? ' source-edited' : '' ?>"
+                                      title="<?= $isCorrected ? 'Data pernah dikoreksi; sumber asli tetap dipertahankan.' : 'Sumber data asli.' ?>">
+                                    <?= htmlspecialchars($sourceLabel) ?>
                                 </span>
                             </td>
                             <td class="table-action-cell">
