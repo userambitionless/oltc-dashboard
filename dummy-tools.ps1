@@ -1,5 +1,10 @@
 $apiUrl = "http://localhost/oltc-dashboard/public/api/record.php"
-$apiKey = "16bc6673857a9cf29f7b90390a723c531e7e2ad052387c96ed4e0c75ac2cade7"
+$apiKey = $env:OLTC_API_KEY
+
+if ([string]::IsNullOrWhiteSpace($apiKey)) {
+    Write-Host 'API Key belum diatur. Jalankan: $env:OLTC_API_KEY = "API_KEY_BARU"' -ForegroundColor Red
+    exit 1
+}
 
 # Buat 10 nilai random 6 digit
 $dummyData = @()
