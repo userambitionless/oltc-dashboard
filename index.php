@@ -1,5 +1,9 @@
 <?php
 
+if (is_file(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/auth.php';
 
@@ -337,7 +341,7 @@ $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 // Export seluruh hasil filter, bukan hanya 10 baris pada halaman aktif.
 // Fitur ini hanya membaca data dan tidak membutuhkan perubahan skema database.
-if (($_GET['export'] ?? '') === 'csv') {
+if (in_array(($_GET['export'] ?? ''), ['csv', 'xlsx'], true)) {
     try {
         $exportStmt = $pdo->prepare("
             SELECT id, hari, tanggal, jam, nilai_data, foto_path, source
@@ -408,6 +412,81 @@ if (($_GET['export'] ?? '') === 'csv') {
             } catch (PDOException $e) {
                 error_log('OLTC dashboard export correction labels error: ' . $e->getMessage());
             }
+        }
+
+        if (($_GET['export'] ?? '') === 'xlsx') {
+            if (!class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)
+                || !class_exists(\PhpOffice\PhpSpreadsheet\Writer\Xlsx::class)) {
+                http_response_code(503);
+                exit('Ekspor XLSX belum siap. Jalankan composer install di folder proyek terlebih dahulu.');
+            }
+
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Riwayat OLTC');
+
+            $headers = [
+                'ID Pembacaan',
+                'Hari',
+                'Tanggal',
+                'Jam',
+                'Nilai Counter',
+                'Evidence Path',
+                'Sumber Data',
+            ];
+            $sheet->fromArray($headers, null, 'A1');
+
+            $excelRow = 2;
+            foreach ($exportRows as $row) {
+                $isManualSource = ($row['source'] ?? 'api') === 'manual';
+                $sourceLabel = $isManualSource ? 'Manual' : 'Main System';
+                if (isset($correctedRecordIds[(int) $row['id']])) {
+                    $sourceLabel .= ' (E)';
+                }
+
+                $counterValue = is_numeric($row['nilai_data']) ? (float) $row['nilai_data'] : (string) $row['nilai_data'];
+                $sheet->fromArray([
+                    (int) ($displayIdByRecord[(int) $row['id']] ?? 0),
+                    (string) ($row['hari'] ?? ''),
+                    (string) $row['tanggal'],
+                    (string) $row['jam'],
+                    $counterValue,
+                    (string) ($row['foto_path'] ?? ''),
+                    $sourceLabel,
+                ], null, 'A' . $excelRow);
+                $excelRow++;
+            }
+
+            $lastRow = max(1, $excelRow - 1);
+            $sheet->getStyle('A1:G1')->getFont()->setBold(true)->getColor()
+                ->setARGB('FFFFFFFF');
+            $sheet->getStyle('A1:G1')->getFill()->setFillType(
+                \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID
+            )->getStartColor()->setARGB('FF17324D');
+            $sheet->getStyle('A1:G1')->getAlignment()->setVertical(
+                \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            );
+            $sheet->getRowDimension(1)->setRowHeight(24);
+            $sheet->freezePane('A2');
+            $sheet->setAutoFilter('A1:G' . $lastRow);
+
+            foreach (range('A', 'G') as $column) {
+                $sheet->getColumnDimension($column)->setAutoSize(true);
+            }
+            $sheet->getColumnDimension('F')->setWidth(32);
+            $sheet->getStyle('A2:A' . $lastRow)->getNumberFormat()->setFormatCode('0');
+            $sheet->getStyle('E2:E' . $lastRow)->getNumberFormat()->setFormatCode('0.###');
+
+            $filename = 'oltc-riwayat-pembacaan-' . date('Ymd-His') . '.xlsx';
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Cache-Control: no-store, no-cache, must-revalidate');
+            header('Pragma: no-cache');
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+            $spreadsheet->disconnectWorksheets();
+            exit;
         }
 
         $filename = 'oltc-riwayat-pembacaan-' . date('Ymd-His') . '.csv';
@@ -1141,9 +1220,14 @@ function evidenceUrl(?string $path): ?string
                     Menampilkan <?= $tableStart ?>–<?= $tableEnd ?> dari <?= $totalData ?> data sesuai filter.
                 </p>
             </div>
-            <a class="secondary-button" href="index.php?<?= htmlspecialchars(http_build_query(array_merge(array_intersect_key($_GET, array_flip(['start_date', 'end_date', 'min_value', 'max_value'])), ['export' => 'csv']))) ?>" aria-label="Ekspor seluruh riwayat sesuai filter ke CSV">
-                Ekspor CSV
-            </a>
+            <div class="export-actions">
+                <a class="secondary-button" href="index.php?<?= htmlspecialchars(http_build_query(array_merge(array_intersect_key($_GET, array_flip(['start_date', 'end_date', 'min_value', 'max_value'])), ['export' => 'csv']))) ?>" aria-label="Ekspor seluruh riwayat sesuai filter ke CSV">
+                    Ekspor CSV
+                </a>
+                <a class="secondary-button" href="index.php?<?= htmlspecialchars(http_build_query(array_merge(array_intersect_key($_GET, array_flip(['start_date', 'end_date', 'min_value', 'max_value'])), ['export' => 'xlsx']))) ?>" aria-label="Ekspor seluruh riwayat sesuai filter ke Excel XLSX">
+                    Ekspor Excel
+                </a>
+            </div>
         </div>
 
         <div class="table-wrap" role="region" aria-label="Tabel riwayat pembacaan" tabindex="0">
