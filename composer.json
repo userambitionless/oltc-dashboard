@@ -1,0 +1,12 @@
+{
+  "name": "userambitionless/oltc-dashboard",
+  "description": "OLTC Counter Monitoring Dashboard",
+  "type": "project",
+  "require": {
+    "php": "^8.1",
+    "phpoffice/phpspreadsheet": "^2.3"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
