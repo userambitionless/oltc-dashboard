@@ -7,7 +7,8 @@
 /config/local.php
 /config/api.php
 
-# Local API testing script
+# Local API testing scripts
+/dummy-tools.ps1
 /dummy-tools.py
 
 # Logs
