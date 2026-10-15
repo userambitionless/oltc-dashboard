@@ -474,8 +474,10 @@ if (in_array(($_GET['export'] ?? ''), ['csv', 'xlsx'], true)) {
                 $sheet->getColumnDimension($column)->setAutoSize(true);
             }
             $sheet->getColumnDimension('F')->setWidth(32);
-            $sheet->getStyle('A2:A' . $lastRow)->getNumberFormat()->setFormatCode('0');
-            $sheet->getStyle('E2:E' . $lastRow)->getNumberFormat()->setFormatCode('0.###');
+            if ($lastRow >= 2) {
+                $sheet->getStyle('A2:A' . $lastRow)->getNumberFormat()->setFormatCode('0');
+                $sheet->getStyle('E2:E' . $lastRow)->getNumberFormat()->setFormatCode('0.###');
+            }
 
             $filename = 'oltc-riwayat-pembacaan-' . date('Ymd-His') . '.xlsx';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
