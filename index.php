@@ -1018,7 +1018,7 @@ function evidenceUrl(?string $path): ?string
             </div>
         </div>
 
-        <div class="table-wrap">
+        <div class="table-wrap" role="region" aria-label="Tabel riwayat pembacaan" tabindex="0">
 
             <?php if (empty($data)): ?>
 
@@ -1029,16 +1029,17 @@ function evidenceUrl(?string $path): ?string
             <?php else: ?>
 
                 <table>
+                    <caption class="sr-only">Riwayat pembacaan counter OLTC, diurutkan dari waktu terbaru ke terlama.</caption>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Hari</th>
-                            <th>Tanggal</th>
-                            <th>Jam</th>
-                            <th>Nilai Counter</th>
-                            <th>Evidence</th>
-                            <th>Sumber</th>
-                            <th>Aksi</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Hari</th>
+                            <th scope="col">Tanggal</th>
+                            <th scope="col">Jam</th>
+                            <th scope="col">Nilai Counter</th>
+                            <th scope="col">Evidence</th>
+                            <th scope="col">Sumber</th>
+                            <th scope="col">Aksi</th>
                         </tr>
                     </thead>
 
@@ -1098,13 +1099,13 @@ function evidenceUrl(?string $path): ?string
                             </td>
                             <td class="table-action-cell">
                                 <div class="table-actions">
-                                    <a class="action-button action-detail" href="?detail=<?= (int) $row['id'] ?>">Detail</a>
+                                    <a class="action-button action-detail" href="?detail=<?= (int) $row['id'] ?>" aria-label="Lihat detail pembacaan nomor <?= $displayId ?>">Detail</a>
                                     <?php if ($isAdmin): ?>
                                     <form method="post" action="index.php" onsubmit="return confirm('Hapus data pembacaan ID <?= htmlspecialchars((string) $row['id'], ENT_QUOTES) ?>? Data dan evidence fotonya akan dihapus permanen.');">
                                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?= htmlspecialchars((string) $row['id']) ?>">
-                                        <button type="submit" class="action-button action-delete">Hapus</button>
+                                        <button type="submit" class="action-button action-delete" aria-label="Hapus pembacaan nomor <?= $displayId ?>">Hapus</button>
                                     </form>
                                     <?php endif; ?>
                                 </div>
