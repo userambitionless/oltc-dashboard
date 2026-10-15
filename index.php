@@ -489,7 +489,7 @@ if (in_array(($_GET['export'] ?? ''), ['csv', 'xlsx'], true)) {
 
             try {
                 // Selesaikan arsip XLSX sebelum mengirim respons agar file tidak parsial.
-                $writer = new \\PhpOffice\\PhpSpreadsheet\\Writer\\Xlsx($spreadsheet);
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
                 $writer->save($temporaryFile);
                 $spreadsheet->disconnectWorksheets();
 
