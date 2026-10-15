@@ -480,15 +480,48 @@ if (in_array(($_GET['export'] ?? ''), ['csv', 'xlsx'], true)) {
             }
 
             $filename = 'oltc-riwayat-pembacaan-' . date('Ymd-His') . '.xlsx';
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment; filename="' . $filename . '"');
-            header('Cache-Control: no-store, no-cache, must-revalidate');
-            header('Pragma: no-cache');
+            $temporaryFile = tempnam(sys_get_temp_dir(), 'oltc_xlsx_');
 
-            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-            $writer->save('php://output');
-            $spreadsheet->disconnectWorksheets();
-            exit;
+            if ($temporaryFile === false) {
+                $spreadsheet->disconnectWorksheets();
+                throw new RuntimeException('Tidak dapat menyiapkan file sementara untuk ekspor Excel.');
+            }
+
+            try {
+                // Selesaikan arsip XLSX sebelum mengirim respons agar file tidak parsial.
+                $writer = new \\PhpOffice\\PhpSpreadsheet\\Writer\\Xlsx($spreadsheet);
+                $writer->save($temporaryFile);
+                $spreadsheet->disconnectWorksheets();
+
+                if (!is_file($temporaryFile) || filesize($temporaryFile) < 4) {
+                    throw new RuntimeException('File XLSX hasil ekspor kosong atau tidak lengkap.');
+                }
+
+                // Buang output buffer agar whitespace/warning dari include tidak merusak arsip ZIP.
+                while (ob_get_level() > 0) {
+                    if (!ob_end_clean()) {
+                        break;
+                    }
+                }
+
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment; filename="' . $filename . '"');
+                header('Content-Length: ' . (string) filesize($temporaryFile));
+                header('Cache-Control: no-store, no-cache, must-revalidate');
+                header('Pragma: no-cache');
+                header('X-Content-Type-Options: nosniff');
+
+                readfile($temporaryFile);
+                unlink($temporaryFile);
+                exit;
+            } catch (Throwable $e) {
+                if (is_file($temporaryFile)) {
+                    unlink($temporaryFile);
+                }
+                error_log('OLTC dashboard XLSX export error: ' . $e->getMessage());
+                http_response_code(500);
+                exit('File Excel gagal dibuat. Periksa log PHP untuk detail kesalahan.');
+            }
         }
 
         $filename = 'oltc-riwayat-pembacaan-' . date('Ymd-His') . '.csv';
