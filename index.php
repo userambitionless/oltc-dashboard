@@ -335,6 +335,131 @@ if ($filterMaxValue !== '' && preg_match('/^\d+$/', $filterMaxValue)) {
 
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
+// Export seluruh hasil filter, bukan hanya 10 baris pada halaman aktif.
+// Fitur ini hanya membaca data dan tidak membutuhkan perubahan skema database.
+if (($_GET['export'] ?? '') === 'csv') {
+    try {
+        $exportStmt = $pdo->prepare("
+            SELECT id, hari, tanggal, jam, nilai_data, foto_path, source
+            FROM counter_readings
+            $whereSql
+            ORDER BY tanggal DESC, jam DESC, id DESC
+        ");
+        $exportStmt->execute($params);
+        $exportRows = $exportStmt->fetchAll();
+
+        // Nomor tampilan tetap dihitung dari semua pembacaan pada tanggal yang sama,
+        // sama seperti tabel riwayat dan tidak berubah akibat filter nilai.
+        $displayIdByRecord = [];
+        if ($exportRows) {
+            $exportDates = array_values(array_unique(array_map(
+                static fn (array $row): string => (string) $row['tanggal'],
+                $exportRows
+            )));
+            $datePlaceholders = [];
+            $dateParams = [];
+            foreach ($exportDates as $index => $dateValue) {
+                $placeholder = ':export_date_' . $index;
+                $datePlaceholders[] = $placeholder;
+                $dateParams[$placeholder] = $dateValue;
+            }
+
+            $allDateRowsStmt = $pdo->prepare(
+                'SELECT id, tanggal
+                 FROM counter_readings
+                 WHERE tanggal IN (' . implode(', ', $datePlaceholders) . ')
+                 ORDER BY tanggal ASC, jam ASC, id ASC'
+            );
+            $allDateRowsStmt->execute($dateParams);
+            $displayCountersByDate = [];
+            foreach ($allDateRowsStmt->fetchAll() as $dateRow) {
+                $dateKey = (string) $dateRow['tanggal'];
+                $displayCountersByDate[$dateKey] = ($displayCountersByDate[$dateKey] ?? 0) + 1;
+                $displayIdByRecord[(int) $dateRow['id']] = $displayCountersByDate[$dateKey];
+            }
+        }
+
+        // Label koreksi bersifat opsional agar ekspor tetap berjalan jika tabel audit
+        // belum ada pada instalasi lama. Tidak ada tabel atau kolom yang ditambahkan.
+        $correctedRecordIds = [];
+        if ($exportRows) {
+            $recordIds = array_values(array_unique(array_map(
+                static fn (array $row): int => (int) $row['id'],
+                $exportRows
+            )));
+            $recordPlaceholders = [];
+            $recordParams = [];
+            foreach ($recordIds as $index => $recordId) {
+                $placeholder = ':export_record_' . $index;
+                $recordPlaceholders[] = $placeholder;
+                $recordParams[$placeholder] = $recordId;
+            }
+
+            try {
+                $correctedStmt = $pdo->prepare(
+                    'SELECT DISTINCT counter_reading_id
+                     FROM counter_reading_corrections
+                     WHERE counter_reading_id IN (' . implode(', ', $recordPlaceholders) . ')'
+                );
+                $correctedStmt->execute($recordParams);
+                foreach ($correctedStmt->fetchAll(PDO::FETCH_COLUMN) as $correctedId) {
+                    $correctedRecordIds[(int) $correctedId] = true;
+                }
+            } catch (PDOException $e) {
+                error_log('OLTC dashboard export correction labels error: ' . $e->getMessage());
+            }
+        }
+
+        $filename = 'oltc-riwayat-pembacaan-' . date('Ymd-His') . '.csv';
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Pragma: no-cache');
+
+        $output = fopen('php://output', 'w');
+        if ($output === false) {
+            throw new RuntimeException('Tidak dapat membuka output ekspor.');
+        }
+
+        // BOM membantu Excel mengenali UTF-8; escape kosong menghasilkan CSV standar.
+        fwrite($output, "\xEF\xBB\xBF");
+        fputcsv($output, [
+            'ID Pembacaan',
+            'Hari',
+            'Tanggal',
+            'Jam',
+            'Nilai Counter',
+            'Evidence Path',
+            'Sumber Data',
+        ], ',', '"', '');
+
+        foreach ($exportRows as $row) {
+            $isManualSource = ($row['source'] ?? 'api') === 'manual';
+            $sourceLabel = $isManualSource ? 'Manual' : 'Main System';
+            if (isset($correctedRecordIds[(int) $row['id']])) {
+                $sourceLabel .= ' (E)';
+            }
+
+            fputcsv($output, [
+                (string) ($displayIdByRecord[(int) $row['id']] ?? ''),
+                (string) ($row['hari'] ?? ''),
+                (string) $row['tanggal'],
+                (string) $row['jam'],
+                formatCounterValue($row['nilai_data']),
+                (string) ($row['foto_path'] ?? ''),
+                $sourceLabel,
+            ], ',', '"', '');
+        }
+
+        fclose($output);
+        exit;
+    } catch (PDOException $e) {
+        error_log('OLTC dashboard CSV export error: ' . $e->getMessage());
+        http_response_code(500);
+        exit('Ekspor riwayat gagal. Silakan coba lagi atau periksa log server.');
+    }
+}
+
 try {
     $countStmt = $pdo->prepare("
         SELECT
@@ -1016,6 +1141,9 @@ function evidenceUrl(?string $path): ?string
                     Menampilkan <?= $tableStart ?>–<?= $tableEnd ?> dari <?= $totalData ?> data sesuai filter.
                 </p>
             </div>
+            <a class="secondary-button" href="index.php?<?= htmlspecialchars(http_build_query(array_merge(array_intersect_key($_GET, array_flip(['start_date', 'end_date', 'min_value', 'max_value'])), ['export' => 'csv']))) ?>" aria-label="Ekspor seluruh riwayat sesuai filter ke CSV">
+                Ekspor CSV
+            </a>
         </div>
 
         <div class="table-wrap" role="region" aria-label="Tabel riwayat pembacaan" tabindex="0">
