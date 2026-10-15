@@ -107,19 +107,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             && ($dateErrors === false || ($dateErrors['warning_count'] === 0 && $dateErrors['error_count'] === 0))
             && $date->format('Y-m-d') === $tanggal;
 
+        // Input type="time" may submit HH:MM when seconds are not explicitly entered.
+        // Normalize both HH:MM and HH:MM:SS into the database's HH:MM:SS format.
         $time = DateTime::createFromFormat('!H:i:s', $jam);
+        if (!$time) {
+            $time = DateTime::createFromFormat('!H:i', $jam);
+            if ($time) {
+                $jam .= ':00';
+                $time = DateTime::createFromFormat('!H:i:s', $jam);
+            }
+        }
         $timeErrors = DateTime::getLastErrors();
         $validTime = $time
             && ($timeErrors === false || ($timeErrors['warning_count'] === 0 && $timeErrors['error_count'] === 0))
             && $time->format('H:i:s') === $jam;
 
-        if (!$validDate || !$validTime || !preg_match('/^\d+$/', $nilaiDataInput)) {
+        // DECIMAL columns can return values such as "157386.000".
+        // Accept an optional decimal fraction while rejecting separators and malformed values.
+        $validCounterValue = preg_match('/^\\d+(?:\\.\\d{1,3})?$/', $nilaiDataInput) === 1;
+
+        if (!$validDate || !$validTime || !$validCounterValue) {
             redirectWithMessage('edit_error=Data%20tanggal%2C%20jam%2C%20atau%20nilai%20tidak%20valid');
         }
 
-        $nilaiData = (int) $nilaiDataInput;
+        $nilaiData = (float) $nilaiDataInput;
 
-        if (abs($nilaiData) > 999999999.999) {
+        if (!is_finite($nilaiData) || $nilaiData < 0 || $nilaiData > 999999999.999) {
             redirectWithMessage('edit_error=Nilai%20counter%20berada%20di%20luar%20batas%20yang%20didukung');
         }
 
