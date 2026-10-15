@@ -374,14 +374,8 @@ try {
 
     $trendCount = count($trendData);
 
-    // Nomor tampilan dimulai dari 1 pada setiap tanggal, mengikuti urutan waktu pembacaan.
-    $displayIdByRecord = [];
-    $displayCountersByDate = [];
-    foreach ($chartDataRows as $chartRow) {
-        $dateKey = (string) $chartRow['tanggal'];
-        $displayCountersByDate[$dateKey] = ($displayCountersByDate[$dateKey] ?? 0) + 1;
-        $displayIdByRecord[(int) $chartRow['id']] = $displayCountersByDate[$dateKey];
-    }
+    // Nomor tampilan dihitung setelah data halaman diambil, memakai seluruh pembacaan
+    // pada tanggal terkait agar nomor tidak berubah saat filter nilai atau pagination berubah.
 
     // Arah trend menggunakan maksimal 3 pembacaan aktual paling terakhir.
     $recentTrendRows = array_slice($chartDataRows, -3);
@@ -442,6 +436,36 @@ try {
     ");
     $dataStmt->execute($params);
     $data = $dataStmt->fetchAll();
+
+    $displayIdByRecord = [];
+    if (!empty($data)) {
+        $pageDates = array_values(array_unique(array_map(
+            static fn (array $row): string => (string) $row['tanggal'],
+            $data
+        )));
+        $datePlaceholders = [];
+        $dateParams = [];
+        foreach ($pageDates as $index => $dateValue) {
+            $placeholder = ':display_date_' . $index;
+            $datePlaceholders[] = $placeholder;
+            $dateParams[$placeholder] = $dateValue;
+        }
+
+        $allDateRowsStmt = $pdo->prepare(
+            'SELECT id, tanggal
+             FROM counter_readings
+             WHERE tanggal IN (' . implode(', ', $datePlaceholders) . ')
+             ORDER BY tanggal ASC, jam ASC, id ASC'
+        );
+        $allDateRowsStmt->execute($dateParams);
+
+        $displayCountersByDate = [];
+        foreach ($allDateRowsStmt->fetchAll() as $dateRow) {
+            $dateKey = (string) $dateRow['tanggal'];
+            $displayCountersByDate[$dateKey] = ($displayCountersByDate[$dateKey] ?? 0) + 1;
+            $displayIdByRecord[(int) $dateRow['id']] = $displayCountersByDate[$dateKey];
+        }
+    }
 
     // Tandai data yang pernah dikoreksi tanpa mengubah source asli (misalnya api/Main System).
     // Query terpisah agar dashboard tetap bisa dibuka jika tabel audit belum dibuat.
