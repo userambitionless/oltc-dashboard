@@ -431,7 +431,7 @@ if (($_GET['export'] ?? '') === 'csv') {
             'Nilai Counter',
             'Evidence Path',
             'Sumber Data',
-        ], ',', '"', '');
+        ], ';', '"', '');
 
         foreach ($exportRows as $row) {
             $isManualSource = ($row['source'] ?? 'api') === 'manual';
@@ -448,7 +448,7 @@ if (($_GET['export'] ?? '') === 'csv') {
                 formatCounterValue($row['nilai_data']),
                 (string) ($row['foto_path'] ?? ''),
                 $sourceLabel,
-            ], ',', '"', '');
+            ], ';', '"', '');
         }
 
         fclose($output);
