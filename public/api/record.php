@@ -109,21 +109,28 @@ if (
     ]);
 }
 
-if (!preg_match('/^\d+$/', $nilaiDataInput)) {
+if (!preg_match('/^\\d+$/', $nilaiDataInput)) {
     jsonResponse(422, [
         'success' => false,
-        'message' => 'nilai_data harus berupa angka yang valid.',
+        'message' => 'nilai_data harus berupa angka bulat tanpa pemisah.',
     ]);
 }
 
-$nilaiData = (int) $nilaiDataInput;
+// DECIMAL(12,3) supports at most 9 integer digits. Check the digit string
+// before casting so oversized values cannot overflow PHP's integer type.
+$normalizedValue = ltrim($nilaiDataInput, '0');
+if ($normalizedValue === '') {
+    $normalizedValue = '0';
+}
 
-if (abs($nilaiData) > 999999999.999) {
+if (strlen($normalizedValue) > 9) {
     jsonResponse(422, [
         'success' => false,
-        'message' => 'nilai_data berada di luar batas yang didukung.',
+        'message' => 'nilai_data maksimal 9 digit (999999999).',
     ]);
 }
+
+$nilaiData = (int) $normalizedValue;
 
 $photoPath = null;
 
