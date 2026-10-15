@@ -123,26 +123,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirectWithMessage('edit_error=Nilai%20counter%20berada%20di%20luar%20batas%20yang%20didukung');
         }
 
+        $reason = trim((string) ($_POST['reason'] ?? ''));
+        if (strlen($reason) > 500) {
+            redirectWithMessage('edit_error=Alasan%20koreksi%20maksimal%20500%20karakter');
+        }
+
         try {
-            $editStmt = $pdo->prepare("
-                UPDATE counter_readings
-                SET tanggal = :tanggal,
-                    jam = :jam,
-                    nilai_data = :nilai_data,
-                    source = 'manual'
+            $pdo->beginTransaction();
+
+            // Lock the current row so the audit entry and update use the same original values.
+            $currentStmt = $pdo->prepare("
+                SELECT id, tanggal, jam, nilai_data, source
+                FROM counter_readings
                 WHERE id = :id
+                LIMIT 1
+                FOR UPDATE
             ");
+            $currentStmt->execute(['id' => $editId]);
+            $currentRecord = $currentStmt->fetch();
 
-            $editStmt->execute([
-                'tanggal' => $tanggal,
-                'jam' => $jam,
-                'nilai_data' => $nilaiData,
-                'id' => $editId,
-            ]);
+            if (!$currentRecord) {
+                $pdo->rollBack();
+                redirectWithMessage('edit_error=Data%20tidak%20ditemukan');
+            }
 
+            $oldValue = (float) $currentRecord['nilai_data'];
+            $hasChanges = (string) $currentRecord['tanggal'] !== $tanggal
+                || (string) $currentRecord['jam'] !== $jam
+                || $oldValue !== (float) $nilaiData;
+
+            if ($hasChanges) {
+                // Fail closed if the audit migration has not been applied: never update without a log.
+                $auditStmt = $pdo->prepare("
+                    INSERT INTO counter_reading_corrections (
+                        counter_reading_id,
+                        old_tanggal,
+                        old_jam,
+                        old_nilai_data,
+                        new_tanggal,
+                        new_jam,
+                        new_nilai_data,
+                        original_source,
+                        changed_by_user_id,
+                        changed_by_username,
+                        reason
+                    ) VALUES (
+                        :counter_reading_id,
+                        :old_tanggal,
+                        :old_jam,
+                        :old_nilai_data,
+                        :new_tanggal,
+                        :new_jam,
+                        :new_nilai_data,
+                        :original_source,
+                        :changed_by_user_id,
+                        :changed_by_username,
+                        :reason
+                    )
+                ");
+
+                $userId = filter_var($currentUser['id'] ?? null, FILTER_VALIDATE_INT);
+                $auditStmt->execute([
+                    'counter_reading_id' => $editId,
+                    'old_tanggal' => $currentRecord['tanggal'],
+                    'old_jam' => $currentRecord['jam'],
+                    'old_nilai_data' => $currentRecord['nilai_data'],
+                    'new_tanggal' => $tanggal,
+                    'new_jam' => $jam,
+                    'new_nilai_data' => $nilaiData,
+                    'original_source' => (string) ($currentRecord['source'] ?? 'api'),
+                    'changed_by_user_id' => ($userId !== false && $userId !== null && $userId > 0) ? $userId : null,
+                    'changed_by_username' => substr((string) ($currentUser['username'] ?? 'unknown'), 0, 100),
+                    'reason' => $reason !== '' ? $reason : null,
+                ]);
+
+                // Keep source unchanged: correcting a Main System reading does not make it a Manual-origin reading.
+                $editStmt = $pdo->prepare("
+                    UPDATE counter_readings
+                    SET tanggal = :tanggal,
+                        jam = :jam,
+                        nilai_data = :nilai_data
+                    WHERE id = :id
+                ");
+                $editStmt->execute([
+                    'tanggal' => $tanggal,
+                    'jam' => $jam,
+                    'nilai_data' => $nilaiData,
+                    'id' => $editId,
+                ]);
+            }
+
+            $pdo->commit();
             redirectWithMessage('detail=' . $editId . '&updated=1');
         } catch (PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
             error_log('OLTC dashboard edit error: ' . $e->getMessage());
+            if (str_contains(strtolower($e->getMessage()), 'counter_reading_corrections')) {
+                redirectWithMessage('edit_error=Tabel%20riwayat%20koreksi%20belum%20tersedia.%20Jalankan%20migrasi%20SQL%20terlebih%20dahulu');
+            }
             redirectWithMessage('edit_error=Data%20gagal%20diperbarui');
         }
     }
@@ -183,6 +264,26 @@ if ($detailId > 0) {
     if (!$detailRecord) {
         header('Location: index.php');
         exit;
+    }
+}
+
+$correctionHistory = [];
+$correctionHistoryAvailable = true;
+if ($detailRecord) {
+    try {
+        $historyStmt = $pdo->prepare("
+            SELECT old_tanggal, old_jam, old_nilai_data,
+                   new_tanggal, new_jam, new_nilai_data,
+                   original_source, changed_by_username, reason, changed_at
+            FROM counter_reading_corrections
+            WHERE counter_reading_id = :id
+            ORDER BY changed_at DESC, id DESC
+        ");
+        $historyStmt->execute(['id' => $detailId]);
+        $correctionHistory = $historyStmt->fetchAll();
+    } catch (PDOException $e) {
+        $correctionHistoryAvailable = false;
+        error_log('OLTC dashboard correction history error: ' . $e->getMessage());
     }
 }
 
@@ -688,6 +789,37 @@ function evidenceUrl(?string $path): ?string
         <div><span>Dibuat</span><strong><?= htmlspecialchars(formatEnglishDateTime($detailRecord['created_at'] ?? null)) ?></strong></div>
         <div><span>Diperbarui</span><strong><?= htmlspecialchars(formatEnglishDateTime($detailRecord['updated_at'] ?? null)) ?></strong></div>
     </div>
+    <div class="correction-history">
+        <div class="data-header">
+            <div>
+                <h3 class="data-title">Riwayat Koreksi</h3>
+                <p class="data-description">Catatan nilai sebelum dan sesudah koreksi, tanpa mengubah sumber data asli.</p>
+            </div>
+        </div>
+        <?php if (!$correctionHistoryAvailable): ?>
+            <div class="empty">Tabel riwayat koreksi belum tersedia. Jalankan file migrasi SQL di folder migrations sebelum menggunakan fitur edit.</div>
+        <?php elseif (empty($correctionHistory)): ?>
+            <div class="empty">Belum ada koreksi untuk pembacaan ini.</div>
+        <?php else: ?>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Waktu Koreksi</th><th>Sebelum</th><th>Sesudah</th><th>Sumber Asli</th><th>Admin</th><th>Alasan</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($correctionHistory as $correction): ?>
+                        <tr>
+                            <td><?= htmlspecialchars(formatEnglishDateTime((string) $correction['changed_at'])) ?></td>
+                            <td><?= htmlspecialchars(formatEnglishDate((string) $correction['old_tanggal'])) ?><br><?= htmlspecialchars((string) $correction['old_jam']) ?><br><strong><?= htmlspecialchars(formatCounterValue($correction['old_nilai_data'])) ?></strong></td>
+                            <td><?= htmlspecialchars(formatEnglishDate((string) $correction['new_tanggal'])) ?><br><?= htmlspecialchars((string) $correction['new_jam']) ?><br><strong><?= htmlspecialchars(formatCounterValue($correction['new_nilai_data'])) ?></strong></td>
+                            <td><?= ($correction['original_source'] ?? 'api') === 'manual' ? 'Manual' : 'Main System' ?></td>
+                            <td><?= htmlspecialchars((string) $correction['changed_by_username']) ?></td>
+                            <td><?= htmlspecialchars((string) ($correction['reason'] ?? '-')) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
     <?php if (!empty($detailRecord['foto_path'])): ?>
         <div class="detail-evidence">
             <div class="detail-evidence-header">
@@ -708,7 +840,7 @@ function evidenceUrl(?string $path): ?string
         <div>
             <p class="eyebrow">EDIT DATA</p>
             <h2 class="data-title">Perbarui Pembacaan #<?= (int) $editRecord['id'] ?></h2>
-            <p class="data-description">Perubahan manual akan dicatat sebagai sumber data <strong>Manual</strong>. Evidence foto yang sudah tersimpan tidak diubah.</p>
+            <p class="data-description">Koreksi akan dicatat di riwayat perubahan. Sumber asli data dan evidence foto tetap dipertahankan.</p>
         </div>
         <a class="secondary-button" href="?detail=<?= (int) $editRecord['id'] ?>">Batal</a>
     </div>
@@ -731,6 +863,11 @@ function evidenceUrl(?string $path): ?string
         <div class="edit-field">
             <label for="edit_nilai_data">Nilai Counter</label>
             <input type="number" id="edit_nilai_data" name="nilai_data" step="0.001" value="<?= htmlspecialchars((string) $editRecord['nilai_data']) ?>" required>
+        </div>
+
+        <div class="edit-field edit-reason-field">
+            <label for="edit_reason">Alasan Koreksi (opsional)</label>
+            <input type="text" id="edit_reason" name="reason" maxlength="500" placeholder="Contoh: hasil verifikasi pembacaan">
         </div>
 
         <div class="edit-actions">
@@ -785,7 +922,7 @@ function evidenceUrl(?string $path): ?string
 
     <?php if (isset($_GET['updated'])): ?>
         <div class="alert alert-success">
-            Data pembacaan berhasil diperbarui. Sumber data sekarang tercatat sebagai Manual.
+            Data pembacaan berhasil diperbarui. Sumber data asli tetap dipertahankan dan koreksi tercatat pada riwayat.
         </div>
     <?php elseif (isset($_GET['deleted'])): ?>
         <div class="alert alert-success">
