@@ -2339,3 +2339,113 @@ body.about-info-open{overflow:hidden}
         padding: 9px 9px;
     }
 }
+
+
+/* UI/UX refinement: history table readability, keyboard access, and mobile context */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.table-wrap[tabindex="0"]:focus-visible {
+    outline: 3px solid rgba(20, 92, 140, .42);
+    outline-offset: -3px;
+    border-radius: 0 0 10px 10px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(20, 92, 140, .48);
+    outline-offset: 2px;
+}
+
+.data-card .table-wrap {
+    scrollbar-color: #aab7c0 #f0f3f5;
+    scrollbar-width: thin;
+}
+
+.data-card table {
+    font-variant-numeric: tabular-nums;
+}
+
+.data-card th {
+    border-bottom: 1px solid #dbe2e6;
+}
+
+.data-card .value {
+    text-align: right;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+}
+
+.data-card th:nth-child(5) {
+    text-align: right;
+}
+
+.data-card .source-edited {
+    border-color: #e8c58a;
+    background: #fff6e6;
+    color: #8a4b08;
+}
+
+.data-card .action-button {
+    min-height: 36px;
+    min-width: 54px;
+}
+
+@media (max-width: 700px) {
+    .data-card .table-wrap {
+        max-width: 100%;
+        overscroll-behavior-inline: contain;
+    }
+
+    .data-card table {
+        min-width: 820px;
+    }
+
+    .data-card thead th:first-child,
+    .data-card tbody td:first-child {
+        position: sticky;
+        left: 0;
+        background: #f7f8f9;
+        box-shadow: 1px 0 0 #dfe4e8, 5px 0 10px rgba(23, 32, 41, .045);
+    }
+
+    .data-card tbody tr:nth-child(even) td:first-child {
+        background: #fcfdfd;
+    }
+
+    .data-card tbody tr:hover td:first-child,
+    .data-card tbody tr:nth-child(even):hover td:first-child {
+        background: #f5f8fa;
+    }
+
+    .data-card thead th:first-child {
+        z-index: 4;
+    }
+
+    .data-card tbody td:first-child {
+        z-index: 1;
+    }
+
+    .data-card .value {
+        padding-right: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .data-card tbody tr,
+    .data-card .action-button {
+        transition: none !important;
+    }
+}
