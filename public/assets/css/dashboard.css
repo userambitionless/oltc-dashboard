@@ -2525,3 +2525,57 @@ textarea:focus-visible {
     }
 }
 
+/* Fine polish pass: restrained refinements across header, cards, filters, history, and mobile. */
+.brand-logos {
+    gap: 14px;
+}
+
+.header-realtime {
+    border-color: rgba(203, 213, 220, .88);
+    box-shadow: 0 5px 18px rgba(24, 38, 48, .09);
+}
+
+.card {
+    box-shadow: 0 6px 22px rgba(21, 32, 41, .045);
+}
+
+.filter-field input,
+.edit-field input {
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+
+.data-card tbody tr {
+    transition: background-color .12s ease;
+}
+
+.data-card .action-button {
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+@media (max-width: 700px) {
+    .brand-logos {
+        gap: 11px;
+    }
+
+    .header-realtime {
+        max-width: calc(100vw - 28px);
+    }
+
+    .filter-actions {
+        gap: 8px;
+    }
+
+    .data-card .data-header {
+        gap: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .filter-field input,
+    .edit-field input,
+    .data-card tbody tr,
+    .data-card .action-button {
+        transition: none !important;
+    }
+}
+
