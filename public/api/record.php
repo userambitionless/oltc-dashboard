@@ -109,7 +109,7 @@ if (
     ]);
 }
 
-if (!preg_match('/^\\d+$/', $nilaiDataInput)) {
+if (!preg_match('/^\d+$/', $nilaiDataInput)) {
     jsonResponse(422, [
         'success' => false,
         'message' => 'nilai_data harus berupa angka bulat tanpa pemisah.',
