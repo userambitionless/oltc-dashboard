@@ -2449,3 +2449,35 @@ textarea:focus-visible {
         transition: none !important;
     }
 }
+
+
+/* History export actions: keep CSV and XLSX controls aligned and mobile-friendly. */
+.export-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.export-actions .secondary-button {
+    min-height: 36px;
+    padding: 0 13px;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .data-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .export-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .export-actions .secondary-button {
+        flex: 1 1 auto;
+    }
+}
