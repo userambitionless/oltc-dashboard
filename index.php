@@ -236,13 +236,13 @@ try {
     $page = min($page, $totalPages);
     $offset = ($page - 1) * $perPage;
 
-    // Trend menggunakan setiap pembacaan aktual sebagai satu titik.
-    // Urutan ditentukan oleh ID data masuk, bukan pengelompokan tanggal/periode.
+    // Grafik, arah trend, dan pembacaan terakhir menggunakan urutan waktu yang sama.
+    // ID menjadi penentu urutan jika beberapa data memiliki tanggal dan jam yang sama.
     $chartStmt = $pdo->prepare("
         SELECT id, tanggal, jam, nilai_data
         FROM counter_readings
         $whereSql
-        ORDER BY id ASC
+        ORDER BY tanggal ASC, jam ASC, id ASC
     ");
     $chartStmt->execute($params);
     $chartDataRows = $chartStmt->fetchAll();
@@ -260,7 +260,7 @@ try {
 
     $trendCount = count($trendData);
 
-    // Nomor tampilan riwayat di-reset untuk setiap tanggal dan mengikuti urutan jam masuk.
+    // Nomor tampilan dimulai dari 1 pada setiap tanggal, mengikuti urutan waktu pembacaan.
     $displayIdByRecord = [];
     $displayCountersByDate = [];
     foreach ($chartDataRows as $chartRow) {
@@ -329,6 +329,8 @@ try {
     $dataStmt->execute($params);
     $data = $dataStmt->fetchAll();
 
+    // Karena chartDataRows sudah diurutkan dari waktu terlama ke terbaru,
+    // baris terakhir adalah pembacaan dengan tanggal/jam paling baru dalam filter.
     $latestRow = $chartDataRows[count($chartDataRows) - 1] ?? null;
     $latestValue = $latestRow['nilai_data'] ?? 0;
 
