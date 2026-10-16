@@ -613,6 +613,30 @@ try {
 
     $trendCount = count($trendData);
 
+    // Ringkasan perubahan dihitung dari data yang sedang dipilih oleh filter.
+    $overallChange = $trendCount >= 2
+        ? $trendData[$trendCount - 1]['value'] - $trendData[0]['value']
+        : null;
+    $latestChange = $trendCount >= 2
+        ? $trendData[$trendCount - 1]['value'] - $trendData[$trendCount - 2]['value']
+        : null;
+
+    $formatSignedChange = static function (?float $change): string {
+        if ($change === null) {
+            return 'Belum cukup data';
+        }
+
+        $sign = $change > 0 ? '+' : ($change < 0 ? '−' : '');
+        return $sign . formatCounterValue(abs($change));
+    };
+
+    $overallChangeClass = $overallChange === null || $overallChange === 0.0
+        ? 'change-neutral'
+        : ($overallChange > 0 ? 'change-up' : 'change-down');
+    $latestChangeClass = $latestChange === null || $latestChange === 0.0
+        ? 'change-neutral'
+        : ($latestChange > 0 ? 'change-up' : 'change-down');
+
     // Nomor tampilan dihitung setelah data halaman diambil, memakai seluruh pembacaan
     // pada tanggal terkait agar nomor tidak berubah saat filter nilai atau pagination berubah.
 
@@ -1205,11 +1229,21 @@ function evidenceUrl(?string $path): ?string
         <?php else: ?>
             <div class="trend-analysis">
                 <div class="trend-metrics">
-                    <div class="trend-metric"><span>Total Pembacaan</span><strong><?= formatCounterValue($trendCount) ?></strong><small>Data Perubahan</small></div>
+                    <div class="trend-metric"><span>Total Pembacaan</span><strong><?= formatCounterValue($trendCount) ?></strong><small>Data sesuai filter aktif</small></div>
                     <div class="trend-metric">
                         <span>Arah Trend</span>
                         <strong class="<?= $trendDirectionClass ?>"><?= htmlspecialchars($trendDirection) ?></strong>
                         <small>3 pembacaan terakhir: <?= htmlspecialchars($recentTrendSummary) ?></small>
+                    </div>
+                    <div class="trend-metric">
+                        <span>Perubahan Total</span>
+                        <strong class="<?= $overallChangeClass ?>"><?= htmlspecialchars($formatSignedChange($overallChange)) ?></strong>
+                        <small>Nilai terakhir dikurangi nilai pertama</small>
+                    </div>
+                    <div class="trend-metric">
+                        <span>Perubahan Terakhir</span>
+                        <strong class="<?= $latestChangeClass ?>"><?= htmlspecialchars($formatSignedChange($latestChange)) ?></strong>
+                        <small>Dibandingkan dengan pembacaan sebelumnya</small>
                     </div>
                 </div>
                 <div class="chart-wrap">
