@@ -2622,3 +2622,39 @@ textarea:focus-visible {
     }
 }
 
+
+
+/* Statistics cards polish: quiet accent and clearer reading hierarchy. */
+.stats .stat-card{
+    position:relative;
+    transition:background-color .18s ease;
+}
+.stats .stat-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:2px;
+    background:var(--primary);
+    opacity:.16;
+    transition:opacity .18s ease;
+}
+.stats .stat-card:hover{
+    background:var(--surface-soft, #fbfcfd);
+}
+.stats .stat-card:hover::before{
+    opacity:.72;
+}
+.stats .stat-label{
+    line-height:1.4;
+}
+.stats .stat-meta{
+    line-height:1.45;
+}
+@media(prefers-reduced-motion:reduce){
+    .stats .stat-card,
+    .stats .stat-card::before{
+        transition:none;
+    }
+}
