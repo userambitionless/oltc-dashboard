@@ -2820,3 +2820,90 @@ textarea:focus-visible {
         padding-right: 9px;
     }
 }
+
+
+/* Realtime clock: keep it tucked above the viewport until explicitly requested. */
+.header-realtime {
+    top: -112px;
+    padding: 10px 14px 11px;
+    pointer-events: auto;
+    transform: translateX(-50%);
+    transition: top .28s ease, box-shadow .28s ease;
+}
+
+.header-realtime.is-collapsed {
+    top: -112px;
+}
+
+.header-realtime.is-expanded {
+    top: 12px;
+    box-shadow: 0 9px 28px rgba(24, 38, 48, .16);
+}
+
+.realtime-toggle {
+    position: absolute;
+    left: 50%;
+    bottom: -28px;
+    display: flex;
+    width: 74px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0;
+    border: 1px solid rgba(203, 213, 220, .95);
+    border-top: 0;
+    border-radius: 0 0 9px 9px;
+    background: rgba(249, 251, 252, .98);
+    color: #71808a;
+    cursor: pointer;
+    transform: translateX(-50%);
+    box-shadow: 0 5px 12px rgba(24, 38, 48, .08);
+}
+
+.realtime-toggle:hover,
+.realtime-toggle:focus-visible {
+    color: var(--primary);
+    background: #fff;
+}
+
+.realtime-toggle-grip {
+    width: 23px;
+    height: 3px;
+    border-radius: 99px;
+    background: #aab6bd;
+}
+
+.realtime-toggle-icon {
+    display: inline-block;
+    font-size: 14px;
+    line-height: 1;
+    transition: transform .2s ease;
+}
+
+.header-realtime.is-expanded .realtime-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.realtime-content {
+    transition: opacity .18s ease;
+}
+
+.header-realtime.is-collapsed .realtime-content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 700px) {
+    .header-realtime.is-expanded {
+        top: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .header-realtime,
+    .realtime-toggle-icon,
+    .realtime-content {
+        transition: none !important;
+    }
+}
