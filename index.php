@@ -1085,7 +1085,7 @@ function evidenceUrl(?string $path): ?string
             <?php if ($isAdmin): ?>
                 <a class="secondary-button" href="?edit=<?= (int) $detailRecord['id'] ?>">Edit data</a>
             <?php endif; ?>
-            <a class="secondary-button" href="index.php">Kembali ke riwayat</a>
+            <a class="secondary-button" href="index.php<?= ($historyQuery = http_build_query(array_intersect_key($_GET, array_flip(['start_date', 'end_date', 'min_value', 'max_value', 'page'])))) !== '' ? '?' . htmlspecialchars($historyQuery) : '' ?>">Kembali ke riwayat</a>
         </div>
     </div>
     <div class="detail-grid">
