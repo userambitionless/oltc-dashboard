@@ -2659,3 +2659,43 @@ textarea:focus-visible {
         transition:none;
     }
 }
+
+
+/* Clickable summary cards and focused latest-reading highlight. */
+.stats .stat-card-link{
+    display:block;
+    color:inherit;
+    text-decoration:none;
+    cursor:pointer;
+}
+.stats .stat-card-link:focus-visible{
+    outline:2px solid var(--primary);
+    outline-offset:-4px;
+}
+#counter-trend,
+#reading-history{
+    scroll-margin-top:24px;
+}
+#latest-reading-row{
+    scroll-margin-top:100px;
+}
+.latest-reading-row{
+    animation:latestReadingHighlight 2.8s ease-out;
+}
+.latest-reading-row td{
+    background:#fff4d6 !important;
+    border-top-color:#e7c66d !important;
+    border-bottom-color:#e7c66d !important;
+}
+.latest-reading-row td:first-child{
+    box-shadow:inset 3px 0 0 #d6a52b;
+}
+@keyframes latestReadingHighlight{
+    0%, 65% { background-color:#ffe7a3; }
+    100% { background-color:transparent; }
+}
+@media(prefers-reduced-motion:reduce){
+    .latest-reading-row{
+        animation:none;
+    }
+}
