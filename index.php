@@ -1564,15 +1564,33 @@ function evidenceUrl(?string $path): ?string
         };
 
         svg.querySelectorAll('[data-chart-point]').forEach((point) => {
-            point.addEventListener('click', () => showPointDetails(Number(point.dataset.chartPoint)));
+            point.addEventListener('click', (event) => {
+                event.stopPropagation();
+                showPointDetails(Number(point.dataset.chartPoint));
+            });
             point.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
+                    event.stopPropagation();
                     showPointDetails(Number(point.dataset.chartPoint));
                 }
             });
         });
+
+        svg.onclick = (event) => {
+            if (!event.target.closest('[data-chart-point]')) {
+                svg.querySelector('.chart-point-tooltip')?.remove();
+                svg.querySelectorAll('.chart-point-selected').forEach((point) => point.classList.remove('chart-point-selected'));
+            }
+        };
     }
+
+    document.addEventListener('click', (event) => {
+        const svg = document.getElementById('counterChart');
+        if (!svg || event.target.closest('#counterChart')) return;
+        svg.querySelector('.chart-point-tooltip')?.remove();
+        svg.querySelectorAll('.chart-point-selected').forEach((point) => point.classList.remove('chart-point-selected'));
+    });
 
     renderCounterChart();
     window.addEventListener('resize', renderCounterChart);
