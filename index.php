@@ -1047,7 +1047,7 @@ function evidenceUrl(?string $path): ?string
                 </button>
 
                 <a href="index.php" class="button button-secondary">
-                    Reset
+                    Reset Filter
                 </a>
             </div>
 
