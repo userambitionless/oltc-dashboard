@@ -2661,7 +2661,7 @@ textarea:focus-visible {
 }
 
 
-/* Clickable summary cards and focused latest-reading highlight. */
+/* Clickable summary cards and temporary latest-reading highlight. */
 .stats .stat-card-link{
     display:block;
     color:inherit;
@@ -2679,23 +2679,23 @@ textarea:focus-visible {
 #latest-reading-row{
     scroll-margin-top:100px;
 }
-.latest-reading-row{
-    animation:latestReadingHighlight 2.8s ease-out;
-}
 .latest-reading-row td{
-    background:#fff4d6 !important;
+    background:#fff0bf !important;
     border-top-color:#e7c66d !important;
     border-bottom-color:#e7c66d !important;
 }
 .latest-reading-row td:first-child{
     box-shadow:inset 3px 0 0 #d6a52b;
 }
-@keyframes latestReadingHighlight{
-    0%, 65% { background-color:#ffe7a3; }
-    100% { background-color:transparent; }
+.latest-reading-row.latest-reading-fade td{
+    transition:background-color .65s ease, border-color .65s ease, box-shadow .65s ease;
+    background:transparent !important;
+    border-top-color:var(--border) !important;
+    border-bottom-color:var(--border) !important;
+    box-shadow:none;
 }
 @media(prefers-reduced-motion:reduce){
-    .latest-reading-row{
-        animation:none;
+    .latest-reading-row.latest-reading-fade td{
+        transition:none;
     }
 }
