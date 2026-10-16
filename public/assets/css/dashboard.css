@@ -2624,44 +2624,38 @@ textarea:focus-visible {
 
 
 
-/* Statistics cards polish: restrained depth and smooth, contained hover. */
+/* Statistics cards polish: subtle press-in hover with a gentle darkening effect. */
 .stats .stat-card{
     position:relative;
-    z-index:0;
-    transition:background-color .22s ease, box-shadow .22s ease;
+    transition:background-color .18s ease, transform .18s ease;
+    transform-origin:center;
 }
 .stats .stat-card::before{
-    content:"";
-    position:absolute;
-    top:0;
-    left:22px;
-    right:22px;
-    height:2px;
-    border-radius:0 0 3px 3px;
-    background:var(--primary);
-    opacity:0;
-    transform:scaleX(.72);
-    transform-origin:center;
-    transition:opacity .22s ease, transform .22s ease;
-    pointer-events:none;
+    content:none;
 }
 .stats .stat-card:hover{
-    background:#fff;
-    box-shadow:inset 0 0 0 1px rgba(49, 93, 126, .07);
+    background:#f0f2f4;
+    transform:scale(.985);
 }
-.stats .stat-card:hover::before{
-    opacity:.8;
-    transform:scaleX(1);
-}
-.stats .stat-label{
-    line-height:1.4;
-}
+.stats .stat-label,
+.stats .stat-value,
 .stats .stat-meta{
-    line-height:1.45;
+    transition:color .18s ease;
+}
+.stats .stat-card:hover .stat-label{
+    color:#64717c;
+}
+.stats .stat-card:hover .stat-value{
+    color:#263746;
+}
+.stats .stat-card:hover .stat-meta{
+    color:#6c7780;
 }
 @media(prefers-reduced-motion:reduce){
     .stats .stat-card,
-    .stats .stat-card::before{
+    .stats .stat-label,
+    .stats .stat-value,
+    .stats .stat-meta{
         transition:none;
     }
 }
