@@ -2945,3 +2945,20 @@ textarea:focus-visible {
 .header-realtime.is-collapsed {
     top: -76px;
 }
+
+
+/* Center the pull grip and arrow as a single visual group. */
+.realtime-toggle {
+    gap: 0;
+}
+.realtime-toggle-grip {
+    margin-right: 7px;
+}
+.realtime-toggle-icon {
+    margin-left: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+}
