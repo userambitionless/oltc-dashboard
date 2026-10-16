@@ -296,3 +296,24 @@ body:after{
     .auth-page:after{animation:none!important}
     *{scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
+
+/* Small login polish: clearer keyboard focus and field feedback. */
+.auth-field .input-wrap:focus-within .field-icon{
+    color:var(--blue);
+}
+.auth-button:focus-visible{
+    outline:3px solid rgba(20,92,140,.28);
+    outline-offset:3px;
+}
+.auth-field input:focus-visible{
+    outline:0;
+}
+@media(hover:hover){
+    .auth-shell{
+        transition:box-shadow .22s ease;
+    }
+    .auth-shell:hover{
+        box-shadow:0 30px 84px rgba(18,38,51,.17),0 6px 22px rgba(18,38,51,.07);
+    }
+}
+
