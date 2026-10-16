@@ -432,3 +432,76 @@ body:after{
     }
 }
 
+/* Restore the original login card appearance while keeping the full-card hover. */
+.auth-shell{
+    border:1px solid rgba(15,45,64,.12);
+    border-radius:22px;
+    background:var(--panel);
+    box-shadow:0 28px 80px rgba(18,38,51,.15),0 5px 20px rgba(18,38,51,.06);
+}
+.auth-visual{border-right:0}
+.auth-panel{
+    padding:0;
+    background:#fff;
+}
+.auth-panel:before{display:none}
+.auth-panel-inner{
+    width:min(380px,100%);
+    margin:0 auto;
+    padding:50px 52px;
+    border:0;
+    border-top:0;
+    background:transparent;
+    box-shadow:none;
+}
+.auth-heading{
+    padding-bottom:0;
+    border-bottom:0;
+    margin-bottom:30px;
+}
+.auth-heading h2{
+    font-size:34px;
+    letter-spacing:-.045em;
+}
+.eyebrow:before{display:none}
+.auth-field input{
+    border-radius:9px;
+    background:#fbfcfd;
+}
+.auth-button{
+    border-radius:9px;
+    box-shadow:0 8px 18px rgba(20,92,140,.16);
+}
+.auth-button:hover{box-shadow:0 10px 22px rgba(20,92,140,.20)}
+.auth-footer{
+    margin-top:30px;
+    padding-top:17px;
+    text-align:center;
+    font-family:"DM Sans",sans-serif;
+    letter-spacing:normal;
+}
+@media(max-width:820px){
+    .auth-shell{border-radius:18px}
+    .auth-panel{padding:0}
+    .auth-panel-inner{
+        padding:42px 34px;
+        border:0;
+        border-top:0;
+        box-shadow:none;
+    }
+}
+@media(max-width:480px){
+    .auth-shell{border-radius:15px}
+    .auth-panel{padding:0}
+    .auth-panel-inner{padding:30px 22px}
+}
+
+/* Keep hover feedback on the full card, using the restored shadow style. */
+@media(hover:hover){
+    .auth-shell:hover{
+        transform:translateY(-3px);
+        border-color:rgba(20,92,140,.24);
+        box-shadow:0 30px 84px rgba(18,38,51,.19),0 6px 22px rgba(18,38,51,.07);
+    }
+}
+
