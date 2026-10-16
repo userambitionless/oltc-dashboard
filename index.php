@@ -1480,13 +1480,6 @@ function evidenceUrl(?string $path): ?string
         const gridCount = 5;
         let markup = '<title id="counterChartTitle">Trend pembacaan counter OLTC</title><desc id="counterChartDescription">Grafik menunjukkan perubahan nilai counter berdasarkan pembacaan terbaru sesuai filter yang dipilih.</desc>';
 
-        if (chartData.length > 1) {
-            const firstValue = chartData[0].value;
-            const lastValue = chartData[chartData.length - 1].value;
-            const trend = lastValue > firstValue ? 'meningkat' : (lastValue < firstValue ? 'menurun' : 'tidak berubah');
-            markup += '<text x="' + padding.left + '" y="15" class="chart-trend-note">Trend pembacaan: ' + trend + '</text>';
-        }
-
         for (let i = 0; i <= gridCount; i++) {
             const value = minValue + ((maxValue - minValue) * (gridCount - i) / gridCount);
             const yPos = y(value);
