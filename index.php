@@ -1444,9 +1444,17 @@ function evidenceUrl(?string $path): ?string
         const values = chartData.map((item) => item.value);
         const rawMin = Math.min(...values);
         const rawMax = Math.max(...values);
-        const range = rawMax - rawMin || Math.max(Math.abs(rawMax) * 0.05, 1);
-        const minValue = rawMin - range * 0.12;
-        const maxValue = rawMax + range * 0.12;
+        const rawRange = rawMax - rawMin;
+        const targetStep = (rawRange || Math.max(Math.abs(rawMax) * 0.05, 1)) / 5;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(targetStep || 1)));
+        const normalizedStep = targetStep / magnitude;
+        const niceStep = (normalizedStep <= 1 ? 1 : normalizedStep <= 2 ? 2 : normalizedStep <= 5 ? 5 : 10) * magnitude;
+        let minValue = Math.floor(rawMin / niceStep) * niceStep;
+        let maxValue = Math.ceil(rawMax / niceStep) * niceStep;
+        if (minValue === maxValue) {
+            minValue -= niceStep;
+            maxValue += niceStep;
+        }
 
         const plotWidth = width - padding.left - padding.right;
         const plotHeight = height - padding.top - padding.bottom;
@@ -1477,11 +1485,11 @@ function evidenceUrl(?string $path): ?string
             return [date, time].filter(Boolean).join(' ');
         };
 
-        const gridCount = 5;
+        const gridCount = Math.max(1, Math.round((maxValue - minValue) / niceStep));
         let markup = '<title id="counterChartTitle">Trend pembacaan counter OLTC</title><desc id="counterChartDescription">Grafik menunjukkan perubahan nilai counter berdasarkan pembacaan terbaru sesuai filter yang dipilih.</desc>';
 
         for (let i = 0; i <= gridCount; i++) {
-            const value = minValue + ((maxValue - minValue) * (gridCount - i) / gridCount);
+            const value = maxValue - (niceStep * i);
             const yPos = y(value);
 
             markup += `<line x1="${padding.left}" y1="${yPos}" x2="${width - padding.right}" y2="${yPos}" class="chart-grid-line"></line>`;
@@ -1503,7 +1511,8 @@ function evidenceUrl(?string $path): ?string
             const accessibleDate = pointDate ? ', ' + pointDate : '';
             markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" tabindex="0" aria-label="' + item.label + ', nilai ' + formatValue(item.value) + accessibleDate + '"><title>' + (pointDate || item.label) + ' — Nilai counter: ' + formatValue(item.value) + '</title></circle>';
 
-            const showLabel = chartData.length <= 12 || index === 0 || index === chartData.length - 1 || index % Math.ceil(chartData.length / 8) === 0;
+            const labelInterval = Math.max(1, Math.ceil(70 / (plotWidth / Math.max(chartData.length - 1, 1))));
+            const showLabel = chartData.length <= 2 || index === 0 || index === chartData.length - 1 || index % labelInterval === 0;
 
             if (showLabel) {
                 markup += `<text x="${cx}" y="${height - 25}" text-anchor="middle" class="chart-axis-label">${formatLabel(item)}</text>`;
