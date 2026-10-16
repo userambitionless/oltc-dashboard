@@ -2945,3 +2945,9 @@ textarea:focus-visible {
     border-color: var(--primary);
     box-shadow: 0 8px 20px rgba(20, 92, 140, .2);
 }
+
+
+/* Keep the full clock handle visible below the browser edge while collapsed. */
+.header-realtime.is-collapsed {
+    top: -76px;
+}
