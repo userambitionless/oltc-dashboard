@@ -1516,6 +1516,20 @@ function evidenceUrl(?string $path): ?string
     renderCounterChart();
     window.addEventListener('resize', renderCounterChart);
 
+    // Keep the latest-reading row highlighted briefly, then fade it back to normal.
+    document.querySelectorAll('.stat-card-link[href="#reading-history"]').forEach((card) => {
+        card.addEventListener('click', () => {
+            const row = document.getElementById('latest-reading-row');
+            if (!row) return;
+
+            row.classList.remove('latest-reading-fade');
+            window.setTimeout(() => {
+                row.classList.add('latest-reading-fade');
+            }, 2000);
+        });
+    });
+
+
     function updateRealtimeClock() {
         const hourMinute = document.getElementById('realtimeHourMinute');
         const seconds = document.getElementById('realtimeSeconds');
