@@ -28,7 +28,7 @@ File tersebut sengaja tidak masuk Git karena berisi secret.
 
 ## Request
 
-Saat ini endpoint menerima **multipart/form-data**.
+Endpoint menerima **JSON (`application/json`)** maupun **multipart/form-data** (untuk kompatibilitas dan upload foto).
 
 Field wajib:
 
@@ -36,7 +36,7 @@ Field wajib:
 |---|---|---|---|
 | `tanggal` | string | `YYYY-MM-DD` | Tanggal pembacaan |
 | `jam` | string | `HH:MM:SS` | Waktu pembacaan |
-| `nilai_data` | numeric | desimal | Nilai digital counter hasil pembacaan |
+| `nilai_data` | string angka bulat | digit tanpa pemisah, maksimal `999999999` | Nilai digital counter hasil pembacaan |
 
 Field opsional:
 
@@ -82,7 +82,7 @@ Contoh:
     "tanggal": "2026-10-05",
     "hari": "Senin",
     "jam": "12:30:00",
-    "nilai_data": 140.5,
+    "nilai_data": 140500,
     "foto_path": null
   }
 }
@@ -107,7 +107,8 @@ API memvalidasi:
 
 - tanggal harus valid dan menggunakan format `YYYY-MM-DD`;
 - jam harus valid dan menggunakan format `HH:MM:SS`;
-- nilai counter harus berupa angka;
+- nilai counter harus berupa digit angka bulat tanpa pemisah;
+- nilai counter maksimal 9 digit (`999999999`);
 - nilai counter harus berada dalam rentang yang didukung database;
 - file evidence harus benar-benar berupa JPG, PNG, atau WEBP;
 - ukuran evidence maksimal 10 MB;
