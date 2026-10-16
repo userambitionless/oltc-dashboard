@@ -1295,7 +1295,7 @@ function evidenceUrl(?string $path): ?string
                     <?php foreach ($data as $row): ?>
                         <?php $displayId = $displayIdByRecord[(int) $row['id']] ?? 0; ?>
 
-                        <tr<?= isset($latestRow['id']) && (int) $row['id'] === (int) $latestRow['id'] ? ' id="latest-reading-row" class="latest-reading-row' . (isset($_GET['detail']) ? ' latest-reading-fade' : '') . '"' : '' ?>>
+                        <tr<?= isset($latestRow['id']) && (int) $row['id'] === (int) $latestRow['id'] ? ' id="latest-reading-row" class="latest-reading-row"' : '' ?>>
                             <td><?= $displayId ?></td>
                             <td><?= htmlspecialchars($row['hari']) ?></td>
                             <td><?= htmlspecialchars(formatEnglishDate($row['tanggal'])) ?></td>
@@ -1523,6 +1523,7 @@ function evidenceUrl(?string $path): ?string
             if (!row) return;
 
             row.classList.remove('latest-reading-fade');
+            row.classList.add('latest-reading-highlight');
             window.setTimeout(() => {
                 row.classList.add('latest-reading-fade');
             }, 1000);
