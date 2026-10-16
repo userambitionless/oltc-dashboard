@@ -2761,3 +2761,62 @@ textarea:focus-visible {
     }
 }
 
+
+
+/* Mobile history table: smoother horizontal scrolling and a stable sticky ID column. */
+@media (max-width: 700px) {
+    .data-card .table-wrap {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y;
+        border-radius: 0 0 10px 10px;
+        scrollbar-gutter: stable;
+    }
+
+    .data-card table {
+        width: 100%;
+        min-width: 820px;
+    }
+
+    .data-card thead th:first-child,
+    .data-card tbody td:first-child {
+        width: 54px;
+        min-width: 54px;
+        max-width: 54px;
+        padding-left: 12px;
+        padding-right: 10px;
+        white-space: nowrap;
+        background-clip: padding-box;
+    }
+
+    .data-card thead th:first-child {
+        box-shadow: 1px 0 0 #dfe4e8, 5px 0 10px rgba(23, 32, 41, .06);
+    }
+
+    .data-card tbody td:first-child {
+        box-shadow: 1px 0 0 #dfe4e8, 5px 0 10px rgba(23, 32, 41, .06);
+    }
+
+    .data-card .table-action-cell {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 420px) {
+    .data-card .table-wrap {
+        scrollbar-width: thin;
+    }
+
+    .data-card thead th,
+    .data-card tbody td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .data-card thead th:first-child,
+    .data-card tbody td:first-child {
+        padding-left: 11px;
+        padding-right: 9px;
+    }
+}
