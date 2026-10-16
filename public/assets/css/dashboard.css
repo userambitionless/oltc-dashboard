@@ -2579,3 +2579,46 @@ textarea:focus-visible {
     }
 }
 
+/* Header identity polish: subtle technical accent without changing layout or behavior. */
+.brand-copy .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+.brand-copy .eyebrow::before{
+    content:"";
+    display:inline-block;
+    width:18px;
+    height:2px;
+    flex:0 0 18px;
+    background:var(--primary);
+    opacity:.72;
+}
+.brand-copy h1{
+    text-wrap:balance;
+}
+.brand-copy .subtitle{
+    max-width:560px;
+    line-height:1.55;
+}
+.header-user{
+    padding:6px 9px;
+    border:1px solid rgba(215,224,229,.82);
+    border-radius:6px;
+    background:rgba(255,255,255,.66);
+}
+.header-realtime{
+    border-color:rgba(186,202,212,.92);
+}
+.status{
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+@media(max-width:700px){
+    .header-user{
+        padding:6px 8px;
+    }
+    .brand-copy .subtitle{
+        max-width:100%;
+    }
+}
+
