@@ -1515,7 +1515,7 @@ function evidenceUrl(?string $path): ?string
             const pointClass = index === chartData.length - 1 ? 'chart-point chart-point-latest' : 'chart-point';
             const pointDate = formatDateTime(item);
             const accessibleDate = pointDate ? ', ' + pointDate : '';
-            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" tabindex="0" aria-label="' + item.label + ', nilai ' + formatValue(item.value) + accessibleDate + '"><title>' + (pointDate || item.label) + ' — Nilai counter: ' + formatValue(item.value) + '</title></circle>';
+            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" data-chart-point="' + index + '" tabindex="0" role="button" aria-label="Klik untuk detail: ' + pointDate + ', nilai ' + formatValue(item.value) + '"><title>Klik untuk detail — ' + (pointDate || item.label) + ' — Nilai counter: ' + formatValue(item.value) + '</title></circle>';
 
             const labelInterval = Math.max(1, Math.ceil(70 / (plotWidth / Math.max(chartData.length - 1, 1))));
             const showLabel = chartData.length <= 2 || index === 0 || index === chartData.length - 1 || index % labelInterval === 0;
@@ -1527,6 +1527,51 @@ function evidenceUrl(?string $path): ?string
 
         svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
         svg.innerHTML = markup;
+
+        const showPointDetails = (index) => {
+            const item = chartData[index];
+            if (!item) return;
+            svg.querySelectorAll('.chart-point-selected').forEach((point) => point.classList.remove('chart-point-selected'));
+            const point = svg.querySelector('[data-chart-point="' + index + '"]');
+            if (point) point.classList.add('chart-point-selected');
+
+            const details = [
+                ['Tanggal', item.tanggal || '-'],
+                ['Jam', item.jam ? String(item.jam).slice(0, 8) : '-'],
+                ['Nilai counter', formatValue(item.value)],
+                ['Sumber', item.source || item.sumber || '-']
+            ];
+            const boxWidth = Math.min(250, width - 24);
+            const boxHeight = 24 + details.length * 22;
+            let boxX = x(index) + 14;
+            if (boxX + boxWidth > width - 8) boxX = x(index) - boxWidth - 14;
+            boxX = Math.max(8, boxX);
+            let boxY = y(item.value) - boxHeight / 2;
+            boxY = Math.max(8, Math.min(height - boxHeight - 8, boxY));
+
+            const escapeXml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;'
+            }[char]));
+            let tooltip = '<g class="chart-point-tooltip" pointer-events="none">';
+            tooltip += '<rect x="' + boxX + '" y="' + boxY + '" width="' + boxWidth + '" height="' + boxHeight + '" rx="9" class="chart-tooltip-bg"></rect>';
+            tooltip += '<text x="' + (boxX + 12) + '" y="' + (boxY + 19) + '" class="chart-tooltip-title">Detail pembacaan</text>';
+            details.forEach((detail, row) => {
+                tooltip += '<text x="' + (boxX + 12) + '" y="' + (boxY + 41 + row * 22) + '" class="chart-tooltip-text">' + escapeXml(detail[0] + ': ' + detail[1]) + '</text>';
+            });
+            tooltip += '</g>';
+            svg.querySelector('.chart-point-tooltip')?.remove();
+            svg.insertAdjacentHTML('beforeend', tooltip);
+        };
+
+        svg.querySelectorAll('[data-chart-point]').forEach((point) => {
+            point.addEventListener('click', () => showPointDetails(Number(point.dataset.chartPoint)));
+            point.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    showPointDetails(Number(point.dataset.chartPoint));
+                }
+            });
+        });
     }
 
     renderCounterChart();
