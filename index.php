@@ -1464,10 +1464,17 @@ function evidenceUrl(?string $path): ?string
 
         const formatValue = (value) => String(Math.round(Number(value)));
 
-        const formatLabel = (label) => {
-            if (!label) return '';
-            const match = String(label).match(/#(\d+)$/);
-            return match ? '#' + match[1] : label;
+        const formatLabel = (item) => {
+            if (!item || !item.tanggal) return '';
+            const parts = String(item.tanggal).split('-');
+            const dateLabel = parts.length === 3 ? parts[2] + '/' + parts[1] : item.tanggal;
+            return dateLabel;
+        };
+
+        const formatDateTime = (item) => {
+            const date = item && item.tanggal ? item.tanggal : '';
+            const time = item && item.jam ? String(item.jam).slice(0, 5) : '';
+            return [date, time].filter(Boolean).join(' ');
         };
 
         const gridCount = 5;
@@ -1499,13 +1506,14 @@ function evidenceUrl(?string $path): ?string
             const cy = y(item.value);
 
             const pointClass = index === chartData.length - 1 ? 'chart-point chart-point-latest' : 'chart-point';
-            const pointDate = item.tanggal ? ' · ' + item.tanggal + ' ' + item.jam : '';
-            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" tabindex="0" aria-label="' + item.label + ', nilai ' + formatValue(item.value) + pointDate + '"><title>' + item.label + ' — ' + formatValue(item.value) + (pointDate ? ' — ' + item.tanggal + ' ' + item.jam : '') + '</title></circle>';
+            const pointDate = formatDateTime(item);
+            const accessibleDate = pointDate ? ', ' + pointDate : '';
+            markup += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (index === chartData.length - 1 ? 5.5 : 4) + '" class="' + pointClass + '" tabindex="0" aria-label="' + item.label + ', nilai ' + formatValue(item.value) + accessibleDate + '"><title>' + (pointDate || item.label) + ' — Nilai counter: ' + formatValue(item.value) + '</title></circle>';
 
             const showLabel = chartData.length <= 12 || index === 0 || index === chartData.length - 1 || index % Math.ceil(chartData.length / 8) === 0;
 
             if (showLabel) {
-                markup += `<text x="${cx}" y="${height - 25}" text-anchor="middle" class="chart-axis-label">${formatLabel(item.label)}</text>`;
+                markup += `<text x="${cx}" y="${height - 25}" text-anchor="middle" class="chart-axis-label">${formatLabel(item)}</text>`;
             }
         });
 
