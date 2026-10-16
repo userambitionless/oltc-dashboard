@@ -317,3 +317,51 @@ body:after{
     }
 }
 
+/* Character pass: a more architectural, instrument-panel login card. */
+.auth-shell{
+    border-radius:5px 24px 5px 24px;
+    border-color:rgba(15,45,64,.20);
+    box-shadow:0 26px 70px rgba(18,38,51,.16),0 4px 0 rgba(20,92,140,.12);
+}
+.auth-visual{
+    border-right:1px solid rgba(255,255,255,.10);
+}
+.auth-panel{
+    position:relative;
+    background:
+        linear-gradient(135deg,rgba(237,245,250,.48),transparent 38%),
+        #fff;
+}
+.auth-panel:before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:64px;
+    height:3px;
+    background:var(--blue);
+}
+.auth-panel-inner{
+    position:relative;
+}
+.auth-heading{
+    padding-bottom:22px;
+    border-bottom:1px solid #e8edf0;
+}
+.eyebrow{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+.eyebrow:before{
+    content:"";
+    display:inline-block;
+    width:19px;
+    height:2px;
+    background:#6aa8ca;
+}
+@media(max-width:820px){
+    .auth-shell{border-radius:5px 20px 5px 20px}
+    .auth-panel:before{width:52px}
+}
+
