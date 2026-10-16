@@ -2997,3 +2997,33 @@ textarea:focus-visible {
 .realtime-toggle-icon {
     display: none;
 }
+
+
+/* Interactive counter chart points and detail tooltip. */
+.chart-point {
+    cursor: pointer;
+    transition: r .15s ease, stroke-width .15s ease;
+}
+.chart-point:hover,
+.chart-point:focus,
+.chart-point.chart-point-selected {
+    r: 7px;
+    stroke: #ffffff;
+    stroke-width: 2.5px;
+    outline: none;
+}
+.chart-tooltip-bg {
+    fill: #ffffff;
+    stroke: #d8e1e7;
+    stroke-width: 1;
+    filter: drop-shadow(0 4px 10px rgba(24, 38, 48, .16));
+}
+.chart-tooltip-title {
+    fill: #243746;
+    font-size: 12px;
+    font-weight: 800;
+}
+.chart-tooltip-text {
+    fill: #435461;
+    font-size: 11px;
+}
