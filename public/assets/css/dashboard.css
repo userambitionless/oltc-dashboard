@@ -2962,3 +2962,22 @@ textarea:focus-visible {
     justify-content: center;
     height: 18px;
 }
+
+
+/* Stack the arrow directly beneath the centered grip. */
+.realtime-toggle {
+    flex-direction: column;
+    gap: 2px;
+    height: 42px;
+    bottom: -42px;
+    padding: 3px 0 4px;
+}
+.realtime-toggle-grip {
+    margin: 0;
+    flex: 0 0 4px;
+}
+.realtime-toggle-icon {
+    margin: 0;
+    height: 14px;
+    line-height: 14px;
+}
