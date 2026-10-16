@@ -420,3 +420,15 @@ body:after{
     .auth-panel-inner{padding:28px 20px 22px}
 }
 
+/* Keep the card hover response visible across the entire card surface. */
+@media(hover:hover){
+    .auth-shell{
+        transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+    }
+    .auth-shell:hover{
+        transform:translateY(-3px);
+        border-color:rgba(20,92,140,.42);
+        box-shadow:0 30px 76px rgba(9,35,53,.24),0 4px 0 #145c8c;
+    }
+}
+
