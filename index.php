@@ -1346,7 +1346,7 @@ function evidenceUrl(?string $path): ?string
                             </td>
                             <td class="table-action-cell">
                                 <div class="table-actions">
-                                    <a class="action-button action-detail" href="?detail=<?= (int) $row['id'] ?>" aria-label="Lihat detail pembacaan nomor <?= $displayId ?>">Detail</a>
+                                    <a class="action-button action-detail" href="index.php?<?= htmlspecialchars(http_build_query(array_merge(array_intersect_key($_GET, array_flip(['start_date', 'end_date', 'min_value', 'max_value', 'page'])), ['detail' => (int) $row['id']]))) ?>" aria-label="Lihat detail pembacaan nomor <?= $displayId ?>">Detail</a>
                                     <?php if ($isAdmin): ?>
                                     <form method="post" action="index.php" onsubmit="return confirm('Hapus data pembacaan ID <?= htmlspecialchars((string) $row['id'], ENT_QUOTES) ?>? Data dan evidence fotonya akan dihapus permanen.');">
                                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
