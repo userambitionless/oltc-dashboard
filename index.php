@@ -1525,7 +1525,7 @@ function evidenceUrl(?string $path): ?string
             row.classList.remove('latest-reading-fade');
             window.setTimeout(() => {
                 row.classList.add('latest-reading-fade');
-            }, 2000);
+            }, 1000);
         });
     });
 
