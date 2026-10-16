@@ -947,7 +947,7 @@ function evidenceUrl(?string $path): ?string
 
     <section class="stats">
 
-        <article class="card stat-card">
+        <a class="card stat-card stat-card-link" href="#counter-trend" aria-label="Lihat trend pembacaan counter">
             <div class="stat-label">Total Pembacaan</div>
             <div class="stat-value">
                 <?= number_format($totalData, 0, ',', '.') ?>
@@ -955,9 +955,9 @@ function evidenceUrl(?string $path): ?string
             <div class="stat-meta">
                 Sesuai filter yang dipilih
             </div>
-        </article>
+        </a>
 
-        <article class="card stat-card">
+        <a class="card stat-card stat-card-link" href="#reading-history" aria-label="Lihat riwayat dan tandai pembacaan terbaru">
             <div class="stat-label">Nilai Terbaru</div>
             <div class="stat-value">
                 <?= htmlspecialchars(formatCounterValue($latestValue)) ?>
@@ -965,7 +965,7 @@ function evidenceUrl(?string $path): ?string
             <div class="stat-meta">
                 Hasil pembacaan terakhir
             </div>
-        </article>
+        </a>
 
         <article class="card stat-card">
             <div class="stat-label">Pembacaan Terakhir</div>
@@ -1186,7 +1186,7 @@ function evidenceUrl(?string $path): ?string
 </section>
 <?php endif; ?>
 
-<section class="card chart-card">
+<section class="card chart-card" id="counter-trend">
         <div class="data-header trend-header">
             <div>
                 <h2 class="data-title">Trend Pembacaan Counter</h2>
@@ -1246,7 +1246,7 @@ function evidenceUrl(?string $path): ?string
         </div>
     <?php endif; ?>
 
-    <section class="card data-card">
+    <section class="card data-card" id="reading-history">
 
         <div class="data-header">
             <div>
@@ -1295,7 +1295,7 @@ function evidenceUrl(?string $path): ?string
                     <?php foreach ($data as $row): ?>
                         <?php $displayId = $displayIdByRecord[(int) $row['id']] ?? 0; ?>
 
-                        <tr>
+                        <tr<?= isset($latestRow['id']) && (int) $row['id'] === (int) $latestRow['id'] ? ' id="latest-reading-row" class="latest-reading-row"' : '' ?>>
                             <td><?= $displayId ?></td>
                             <td><?= htmlspecialchars($row['hari']) ?></td>
                             <td><?= htmlspecialchars(formatEnglishDate($row['tanggal'])) ?></td>
