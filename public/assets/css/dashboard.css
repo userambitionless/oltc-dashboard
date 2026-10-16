@@ -2699,3 +2699,65 @@ textarea:focus-visible {
         transition:none;
     }
 }
+
+/* History table polish: clearer hierarchy and steadier row scanning. */
+.data-card table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.data-card thead th {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    color: #4d5c66;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.data-card tbody td {
+    padding-top: 13px;
+    padding-bottom: 13px;
+    vertical-align: middle;
+}
+
+.data-card tbody tr {
+    transition: background-color .16s ease;
+}
+
+.data-card tbody tr:hover {
+    background-color: #f5f8fa;
+}
+
+.data-card tbody td:first-child {
+    color: #71808a;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+}
+
+.data-card .time {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.data-card .source-cell {
+    white-space: nowrap;
+}
+
+.data-card .table-action-cell {
+    min-width: 112px;
+}
+
+.data-card .table-actions {
+    align-items: center;
+    gap: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .data-card tbody tr {
+        transition: none !important;
+    }
+}
+
