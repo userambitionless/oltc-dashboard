@@ -926,7 +926,12 @@ function evidenceUrl(?string $path): ?string
                 <a class="secondary-button" href="users.php">Manajemen User</a>
             </div>
         <?php endif; ?>
-            <div class="header-meta header-realtime" aria-label="Waktu realtime">
+            <div class="header-meta header-realtime is-collapsed" id="realtimeClock" aria-label="Waktu realtime">
+                <button type="button" class="realtime-toggle" id="realtimeToggle" aria-label="Tampilkan jam realtime selama 3 detik" aria-expanded="false">
+                    <span class="realtime-toggle-grip"></span>
+                    <span class="realtime-toggle-icon" aria-hidden="true">⌄</span>
+                </button>
+                <div class="realtime-content">
                 <div class="realtime-topline">
                     <span class="realtime-dot"></span>
                     <span class="realtime-label">Waktu Realtime</span>
@@ -936,6 +941,7 @@ function evidenceUrl(?string $path): ?string
                     <span id="realtimeHourMinute">--:--</span><span id="realtimeSeconds" class="realtime-seconds">:--</span>
                 </div>
                 <div id="realtimeDate" class="realtime-date">Memuat tanggal...</div>
+                </div>
             </div>
             <?php if ($latestDateTime): ?>
                 <div class="header-meta">
@@ -1646,3 +1652,36 @@ function evidenceUrl(?string $path): ?string
 </script>
 </body>
 </html>
+
+<script>
+(() => {
+    const clock = document.getElementById('realtimeClock');
+    const toggle = document.getElementById('realtimeToggle');
+    if (!clock || !toggle) return;
+
+    let hideTimer;
+    const hideClock = () => {
+        clock.classList.add('is-collapsed');
+        clock.classList.remove('is-expanded');
+        toggle.setAttribute('aria-expanded', 'false');
+    };
+    toggle.addEventListener('click', () => {
+        window.clearTimeout(hideTimer);
+        if (clock.classList.contains('is-expanded')) {
+            hideClock();
+            return;
+        }
+        clock.classList.remove('is-collapsed');
+        clock.classList.add('is-expanded');
+        toggle.setAttribute('aria-expanded', 'true');
+        hideTimer = window.setTimeout(hideClock, 3000);
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && clock.classList.contains('is-expanded')) {
+            window.clearTimeout(hideTimer);
+            hideClock();
+            toggle.focus();
+        }
+    });
+})();
+</script>
