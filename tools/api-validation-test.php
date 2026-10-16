@@ -22,7 +22,7 @@ $tests = [
         'post' => [
             'tanggal' => date('Y-m-d'),
             'jam' => '14:00:00',
-            'nilai_data' => '150.000',
+            'nilai_data' => '15000',
         ],
     ],
     [
@@ -32,7 +32,7 @@ $tests = [
         'post' => [
             'tanggal' => '',
             'jam' => '14:00:00',
-            'nilai_data' => '150.000',
+            'nilai_data' => '15000',
         ],
     ],
     [
@@ -42,7 +42,7 @@ $tests = [
         'post' => [
             'tanggal' => '2026-99-99',
             'jam' => '14:00:00',
-            'nilai_data' => '150.000',
+            'nilai_data' => '15000',
         ],
     ],
     [
@@ -52,7 +52,17 @@ $tests = [
         'post' => [
             'tanggal' => date('Y-m-d'),
             'jam' => '99:99:99',
-            'nilai_data' => '150.000',
+            'nilai_data' => '15000',
+        ],
+    ],
+    [
+        'name' => 'Nilai counter melebihi batas 9 digit',
+        'expected' => 422,
+        'headers' => ['X-API-Key: ' . $apiKey],
+        'post' => [
+            'tanggal' => date('Y-m-d'),
+            'jam' => '14:00:00',
+            'nilai_data' => '1000000000',
         ],
     ],
     [
@@ -77,6 +87,7 @@ $passed = 0;
 $total = count($tests);
 
 echo "OLTC API VALIDATION TEST\n";
+echo "Target: {$url}\n";
 echo str_repeat('=', 52) . "\n";
 
 foreach ($tests as $test) {
