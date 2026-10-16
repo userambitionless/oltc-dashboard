@@ -1295,7 +1295,7 @@ function evidenceUrl(?string $path): ?string
                     <?php foreach ($data as $row): ?>
                         <?php $displayId = $displayIdByRecord[(int) $row['id']] ?? 0; ?>
 
-                        <tr<?= isset($latestRow['id']) && (int) $row['id'] === (int) $latestRow['id'] ? ' id="latest-reading-row" class="latest-reading-row"' : '' ?>>
+                        <tr<?= isset($latestRow['id']) && (int) $row['id'] === (int) $latestRow['id'] ? ' id="latest-reading-row" class="latest-reading-row' . (isset($_GET['detail']) ? ' latest-reading-fade' : '') . '"' : '' ?>>
                             <td><?= $displayId ?></td>
                             <td><?= htmlspecialchars($row['hari']) ?></td>
                             <td><?= htmlspecialchars(formatEnglishDate($row['tanggal'])) ?></td>
