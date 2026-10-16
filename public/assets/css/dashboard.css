@@ -2679,12 +2679,12 @@ textarea:focus-visible {
 #latest-reading-row{
     scroll-margin-top:100px;
 }
-.latest-reading-row td{
+.latest-reading-row.latest-reading-highlight td{
     background:#fff0bf !important;
     border-top-color:#e7c66d !important;
     border-bottom-color:#e7c66d !important;
 }
-.latest-reading-row td:first-child{
+.latest-reading-row.latest-reading-highlight td:first-child{
     box-shadow:inset 3px 0 0 #d6a52b;
 }
 .latest-reading-row.latest-reading-fade td{
